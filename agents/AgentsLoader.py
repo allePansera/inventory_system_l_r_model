@@ -1,0 +1,32 @@
+from agents.DQN_MLP_Agent import DqnMlp
+from agents.AgentAbs import Agent
+import gym
+import datetime
+
+
+class AgentsLoader:
+
+    def __init__(self, w_env: gym.Env):
+        self.w_env = w_env
+        self.agents: [Agent] = []
+        self.__load_agents()
+
+    def __load_agents(self):
+        self.agents.append(DqnMlp(self.w_env))
+
+    def train(self, episode_duration: int = 1000, plot_rewards: bool = True) -> float:
+        """
+        Train the agents and store the respective models.
+        :param episode_duration: how many episode run to find optimal policy and value function
+        :param plot_rewards: choose whether plot or not reward progression during training
+        :return: duration is seconds
+        """
+        start = datetime.datetime.now()
+
+        for agent in self.agents:
+            self.w_env.reset()
+            agent.train(episode_duration=episode_duration, plot_rewards=plot_rewards)
+            agent.save_model()
+
+        end = datetime.datetime.now()
+        return (end-start).total_seconds()
