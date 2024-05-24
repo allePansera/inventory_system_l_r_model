@@ -106,6 +106,9 @@ class Warehouse:
         self.last_inventory_level_timestamp: float = 0
         self.total_sales = 0
         self.time_last_order = 0
+        self.items_ordered_currently = 0
+        self.delta_time_last_order = 0.0
+        self.orders_counter_currently = 0
 
         # Attr. to evaluate system performance
         self.daily_total_cost = []
