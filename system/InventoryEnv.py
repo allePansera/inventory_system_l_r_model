@@ -1,6 +1,6 @@
-from gym import spaces
 from .Inventory import Warehouse
-import gym
+import gymnasium as gym
+from gymnasium import spaces
 import simpy
 import numpy as np
 
@@ -53,7 +53,7 @@ class WarehouseEnv(gym.Env):
         ],
         dtype=np.float32)
 
-    def reset(self):
+    def reset(self, **kwargs):
         """
         Reset state of my warehouse
         :return: system's state
@@ -65,13 +65,13 @@ class WarehouseEnv(gym.Env):
         # Re_execute all process
         self.warehouse.run_processes()
         # Return current state
-        return self._get_observation()
+        return self._get_observation(), {}
 
     def step(self, action):
         """
         Analyze a system until a step is done. A step is a month inside system
         :param action: number from 0 to 100 regarding qty. that we can order
-        :return: system's state, reward, done
+        :return: system's state, reward, done, truncated, info
         """
         # Info attr. is explainatory
         info = {
@@ -86,7 +86,7 @@ class WarehouseEnv(gym.Env):
         self.end = self.warehouse.env.now
         # Total cost over last month is attribute reward, negative since we maximize it
         self.reward = -1*self.warehouse.day_total_cost[-1]
-        return self._get_observation(), self.reward, False, info
+        return self._get_observation(), self.reward, False, False, info
 
 
 

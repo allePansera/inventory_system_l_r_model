@@ -8,8 +8,9 @@ def t_student_critical_value(alpha: float, n: int) -> float:
 
 
 class RewardCallback(BaseCallback):
-    def __init__(self, verbose=0):
+    def __init__(self, description, verbose=0):
         super(RewardCallback, self).__init__(verbose)
+        self.description = description
         self.rewards = []
         self.actions = []
 
@@ -31,7 +32,7 @@ class RewardCallback(BaseCallback):
         ax2.plot(self.actions, color=color)
         ax2.tick_params(axis='y', labelcolor=color)
         fig.tight_layout()
-        plt.title('Training Rewards and Actions over Time')
+        plt.title(f'{self.description} Training Rewards and Actions over Time')
         plt.show()
 
 

@@ -116,8 +116,8 @@ class Warehouse:
         self.state.delta_time_last_order = 0
         self.state.orders_counter = 0
         self.state.qty_ordered_until_now = 0
-        self.state.turnover_rate = self.turnover_rate
-        self.state.order_rate = self.order_rate
+        self.state.turnover_rate = 0
+        self.state.order_rate = 0
 
     @property
     def inventory_level(self):
@@ -145,6 +145,8 @@ class Warehouse:
         except ZeroDivisionError:
             return 0
         except statistics.StatisticsError:
+            return 0
+        except RuntimeWarning:
             return 0
 
     @inventory_level.setter

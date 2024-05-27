@@ -1,3 +1,4 @@
+from agents.AgentsLoader import AgentsLoader
 from system.Inventory import Warehouse
 from system.InventoryEnv import WarehouseEnv
 from agents.AgentsLoader import AgentsLoader
@@ -7,8 +8,6 @@ from tabulate import tabulate
 import logging
 import simpy
 import random
-import warnings
-warnings.filterwarnings("error", category=RuntimeWarning)
 
 logging_path = 'log/output.log'
 # Clean plot directory
@@ -58,12 +57,7 @@ w_gym_env = WarehouseEnv(
 )
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
-duration_sec = al.train(
-    episode_duration=365*5, # 1 Year
-    plot_rewards=True
-)
-
-logger.info(f"All agents have been trained in {duration_sec} sec")
+al.load_weights()
 
 # Run the trained agents and check for the results
 for agent in al.agents:
@@ -86,4 +80,3 @@ for agent in al.agents:
         tablefmt="fancy_grid"
     )
     print(tab)
-

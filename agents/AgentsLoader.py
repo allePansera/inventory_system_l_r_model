@@ -1,4 +1,5 @@
 from agents.DQN_MLP_Agent import DqnMlp
+from agents.PPO_MLP_Agent import PpoMlp
 from agents.AgentAbs import Agent
 import gym
 import datetime
@@ -12,7 +13,12 @@ class AgentsLoader:
         self.__load_agents()
 
     def __load_agents(self):
-        self.agents.append(DqnMlp(self.w_env))
+        self.agents.append(PpoMlp())
+        self.agents.append(DqnMlp())
+
+    def load_weights(self):
+        for agent in self.agents:
+            agent.load_model(w_env=self.w_env)
 
     def train(self, episode_duration: int = 1000, plot_rewards: bool = True) -> float:
         """
@@ -25,8 +31,11 @@ class AgentsLoader:
 
         for agent in self.agents:
             self.w_env.reset()
-            agent.train(episode_duration=episode_duration, plot_rewards=plot_rewards)
+            agent.train(w_env=self.w_env, episode_duration=episode_duration, plot_rewards=plot_rewards)
             agent.save_model()
 
         end = datetime.datetime.now()
         return (end-start).total_seconds()
+
+
+
