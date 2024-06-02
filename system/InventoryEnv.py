@@ -84,7 +84,9 @@ class WarehouseEnv(gym.Env):
         # Run system for 1 step
         self.warehouse.env.run(until=self.end+self.step_duration)
         self.end = self.warehouse.env.now
-        # Total cost over last month is attribute reward, negative since we maximize it
+        # Update costs array
+        self.warehouse.update_costs()
+        # Total cost over last day is attribute reward, negative since we maximize it
         self.reward = -1*self.warehouse.day_total_cost[-1]
         return self._get_observation(), self.reward, False, False, info
 

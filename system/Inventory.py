@@ -92,7 +92,6 @@ class Warehouse:
         """
         # Execute system tasks
         self.env.process(self.demand_generator())
-        self.env.process(self.update_daily_cost())
 
     def reset_system_attributes(self):
         """
@@ -202,19 +201,17 @@ class Warehouse:
         self.env.process(self.order_given_qty(action))
         if self.debug_mode: print(f"Merch received, current level: {self.inventory_level} - {self.env.now}")
 
-    def update_daily_cost(self):
+    def update_costs(self):
         """
         Method used to update system's cost
         :return:
         """
-        while True:
-            yield self.env.timeout(self.day_duration)
-            # Daily cost check
-            if len(self.daily_total_cost) == 0:
-                self.daily_total_cost.append(round(self.total_cost, 2))
-            else:
-                previous_cost = sum(self.daily_total_cost)
-                self.daily_total_cost.append(round(self.total_cost-previous_cost,2))
+        # Daily cost check
+        if len(self.daily_total_cost) == 0:
+            self.daily_total_cost.append(round(self.total_cost, 2))
+        else:
+            previous_cost = sum(self.daily_total_cost)
+            self.daily_total_cost.append(round(self.total_cost-previous_cost,2))
 
     def order_given_qty(self, qty_2_order: int) -> None:
         """
