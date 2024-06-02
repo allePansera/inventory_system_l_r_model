@@ -1,5 +1,7 @@
 from agents.DQN_MLP_Agent import DqnMlp
 from agents.PPO_MLP_Agent import PpoMlp
+from agents.A2C_MLP_Agent import A2cMlp
+from agents.SAC_MLP_Agent import SacMlp
 from agents.AgentAbs import Agent
 import gym
 import datetime
@@ -15,6 +17,9 @@ class AgentsLoader:
     def __load_agents(self):
         self.agents.append(PpoMlp())
         self.agents.append(DqnMlp())
+        self.agents.append(A2cMlp())
+        self.agents.append(DdpgMlp())
+        self.agents.append(SacMlp())
 
     def load_weights(self):
         for agent in self.agents:

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from typing import Callable
 from system.State import State
+from system.Item import Item
 import random
 import simpy
 import statistics
@@ -31,6 +32,7 @@ class Warehouse:
             lead_time: Callable[[], float],
             demand_inter_arrival_mean_time: Callable[[], float],
             inventory_level: Callable[[], float],
+            items: [Item] = [],
             demand_distribution = [[1, 2, 3, 4], [1 / 3, 1 / 6, 1 / 6, 1 / 3]],
             order_setup_cost: float = 32,
             order_incremental_cost: float = 3,
@@ -41,6 +43,7 @@ class Warehouse:
 
         self.id = id
         self.env = env
+        self.items = items
         self.demand_inter_arrival_mean_time = demand_inter_arrival_mean_time
         self.demand_distribution = demand_distribution
         self.init_inventory_level = inventory_level
@@ -74,7 +77,6 @@ class Warehouse:
             qty_ordered_until_now=self.items_ordered_currently,
             delta_time_last_order=self.delta_time_last_order,
             orders_counter=self.orders_counter_currently,
-            turnover_rate=0,
             order_rate=0
         )
 
@@ -115,7 +117,6 @@ class Warehouse:
         self.state.delta_time_last_order = 0
         self.state.orders_counter = 0
         self.state.qty_ordered_until_now = 0
-        self.state.turnover_rate = 0
         self.state.order_rate = 0
 
     @property
@@ -131,6 +132,8 @@ class Warehouse:
         try:
             inventory_position_history_list = [el[1] for el in self.it]
             avg_inventory = statistics.mean(inventory_position_history_list)
+            if avg_inventory == 0:
+                return 0
             return self.total_sales/avg_inventory
         except ZeroDivisionError:
             return 0
@@ -140,6 +143,8 @@ class Warehouse:
     @property
     def order_rate(self):
         try:
+            if self.orders_counter_currently == 0:
+                return 0
             return self.items_ordered_currently / self.orders_counter_currently
         except ZeroDivisionError:
             return 0

@@ -7,3 +7,4 @@ stable-baselines3[extra]
 gym
 tabulate
 gymna
+stable-baselines

@@ -1,11 +1,11 @@
-from stable_baselines3 import DQN
+from stable_baselines3 import SAC
 from agents.AgentAbs import Agent
 from agents.Policy import CustomLSTMExtractor
 from analysis import RewardCallback
 import gymnasium as gym
 
 
-class DqnMlp(Agent):
+class SacMlp(Agent):
     """
     Pseudo Code:
 
@@ -121,8 +121,8 @@ class DqnMlp(Agent):
             features_extractor_class=CustomLSTMExtractor,
             features_extractor_kwargs=dict(features_dim=64)
         )
-        self.model = DQN("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
-        self.reward_callback = RewardCallback("DQN")
+        self.model = SAC("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
+        self.reward_callback = RewardCallback("SAC")
         self.model.learn(total_timesteps=episode_duration,
                          callback=self.reward_callback
                          )
@@ -138,7 +138,7 @@ class DqnMlp(Agent):
         assert self.model is not None
         return self.model.predict(observation)
 
-    def save_model(self, path: str = "models/dqn_mlp"):
+    def save_model(self, path: str = "models/sac_mlp"):
         """
         Save trained model
         :param path: location to use to read model paramters
@@ -147,7 +147,7 @@ class DqnMlp(Agent):
         assert self.model is not None
         self.model.save(path)
 
-    def load_model(self,  w_env: gym.Env, path: str = "models/dqn_mlp"):
+    def load_model(self,  w_env: gym.Env, path: str = "models/sac_mlp"):
         """
         Train the agent.
         :param w_env: gym Environment instance
@@ -155,10 +155,10 @@ class DqnMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = DQN('MlpPolicy', self.w_env, verbose=1)
+        self.model = SAC('MlpPolicy', self.w_env, verbose=1)
         self.model.load(path)
 
     def __repr__(self):
-        return "DQN - MLP Policy"
+        return "SAC - MLP Policy"
 
 

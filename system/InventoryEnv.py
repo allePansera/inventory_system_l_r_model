@@ -32,11 +32,11 @@ class WarehouseEnv(gym.Env):
         # Save environment state
         self.state = self.warehouse.state
         # Define actions
-        self.action_space = spaces.Discrete(101)
+        self.action_space = spaces.Discrete(1000)
         # Set step duration (month)
         self.step_duration = step_duration
         # Define possible set of observation
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(6,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5,), dtype=np.float32)
         # Define reward class attribute
         self.reward = 0
         # End
@@ -48,7 +48,6 @@ class WarehouseEnv(gym.Env):
             self.warehouse.state.qty_ordered_until_now,
             self.warehouse.state.delta_time_last_order,
             self.warehouse.state.orders_counter,
-            self.warehouse.state.turnover_rate,
             self.warehouse.state.order_rate
         ],
         dtype=np.float32)

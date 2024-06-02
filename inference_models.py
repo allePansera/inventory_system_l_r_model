@@ -53,7 +53,7 @@ w_simpy_env = Warehouse(
 # Define Warehouse Gym Env
 w_gym_env = WarehouseEnv(
     warehouse=w_simpy_env,
-    step_duration=1.001, # 1 Day, add delay to process last cost
+    step_duration=1, # 1 Day, add delay to process last cost
 )
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
@@ -65,7 +65,7 @@ for agent in al.agents:
     logger.info(agent)
     headers = ["Inventory position","Delta Quantity Ordered",
                "Delta Time Last Order", "Delta Orders Counter",
-               "Turnover rate", "Order Rate",
+               "Order Rate",
                "Action", "Reward"]
     prediction = []
     prediction.append([*obs, 0, 0])

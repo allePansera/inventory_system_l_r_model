@@ -13,7 +13,6 @@ class State:
                  qty_ordered_until_now: int,
                  delta_time_last_order: float,
                  orders_counter: int,
-                 turnover_rate: float,
                  order_rate: float) -> None:
         """
 
@@ -21,14 +20,12 @@ class State:
         :param qty_ordered_until_now: qty ordered considering current item
         :param delta_time_last_order: delta time with respect to last order execution
         :param orders_counter: total items ordered
-        :param turnover_rate: turnover rate considering total sales and avg of inventory level
         :param order_rate: order rate considering current exposed merch and current order exposed
         """
         self.ip = inventory_position
         self.qty_ordered_until_now = qty_ordered_until_now
         self.delta_time_last_order = delta_time_last_order
         self.orders_counter = orders_counter
-        self.turnover_rate = turnover_rate
         self.order_rate = order_rate
 
     def __str__(self):
@@ -39,7 +36,6 @@ class State:
 Delta Quantity Ordered Until Now: {self.qty_ordered_until_now}
 Delta Time Last Order: {self.delta_time_last_order}
 Delta Orders Counter: {self.orders_counter}
-Turnover Rate: {self.turnover_rate}
 Order Rate: {self.order_rate}"""
         return output
 
