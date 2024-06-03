@@ -22,13 +22,13 @@ class WarehouseEnv(gym.Env):
 
     def _get_observation(self):
         obs = []
-        for state in self.warehouse.state:
+        for item in self.warehouse.items:
             obs.extend([
-                state.ip,
-                state.qty_ordered_until_now,
-                state.delta_time_last_order,
-                state.orders_counter,
-                state.order_rate
+                self.warehouse.state[item.id].ip,
+                self.warehouse.state[item.id].qty_ordered_until_now,
+                self.warehouse.state[item.id].delta_time_last_order,
+                self.warehouse.state[item.id].orders_counter,
+                self.warehouse.state[item.id].order_rate
             ])
         return np.array(obs, dtype=np.float32)
 
@@ -42,9 +42,9 @@ class WarehouseEnv(gym.Env):
         info = {}
         for idx, action in enumerate(actions):
             item = self.warehouse.items[idx]
-            info[f'stock_before_action_item_{item}'] = self.state[item].ip
-            info[f'stock_after_action_item_{item}'] = self.state[item].ip + action
-            info[f'qty_2_order_item_{item}'] = action
+            info[f'stock_before_action_item_{item}'.replace(" ","")] = self.state[item.id].ip
+            info[f'stock_after_action_item_{item}'.replace(" ","")] = self.state[item.id].ip + action
+            info[f'qty_2_order_item_{item}'.replace(" ","")] = action
             self.warehouse.take_action(action, item)
 
         self.warehouse.env.run(until=self.end+self.step_duration)

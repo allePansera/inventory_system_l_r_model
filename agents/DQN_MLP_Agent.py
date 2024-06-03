@@ -1,7 +1,7 @@
 from stable_baselines3 import DQN
 from agents.AgentAbs import Agent
 from agents.Policy import CustomLSTMExtractor
-from analysis import RewardCallback
+from agents.Callback import RewardCallback
 import gymnasium as gym
 
 

@@ -29,7 +29,7 @@ class Warehouse:
         self.inventory_levels = {
                                 item.id: int(init_level())
                                 for item, init_level
-                                in zip(self.items,self.init_inventory_levels)
+                                in zip(self.items, self.init_inventory_levels)
                             }
         self.order_setup_cost = order_setup_cost
         self.order_incremental_cost = order_incremental_cost
@@ -45,7 +45,7 @@ class Warehouse:
         self.total_sales = {item.id: 0 for item in self.items}
 
         # Attr. to evaluate system performance
-        self.total_order_cost = {item.id: 0 for item in self.items}
+        self.total_order_cost_per_item = {item.id: 0 for item in self.items}
         self.daily_total_cost = []
 
         # Attr. used to implement state
@@ -94,12 +94,12 @@ class Warehouse:
         self.time_last_order = {item.id: 0 for item in self.items}
         self.delta_time_last_order = {item.id: 0 for item in self.items}
         self.orders_counter_currently = {item.id: 0 for item in self.items}
-        for state, level in zip(self.state, self.inventory_levels):
-            state.ip = level
-            state.delta_time_last_order = 0
-            state.orders_counter = 0
-            state.qty_ordered_until_now = 0
-            state.order_rate = 0
+        for item, level in zip(self.items, self.init_inventory_levels):
+            self.state[item.id].ip = level()
+            self.state[item.id].delta_time_last_order = 0
+            self.state[item.id].orders_counter = 0
+            self.state[item.id].qty_ordered_until_now = 0
+            self.state[item.id].order_rate = 0
 
     @property
     def total_items_ordered(self):
@@ -188,7 +188,7 @@ class Warehouse:
         self.orders_counter_currently[item.id] += 1
         self.items_ordered_currently[item.id] += qty_2_order
         self.total_sales[item.id] += qty_2_order
-        self.total_order_cost_per_item += (self.order_setup_cost + self.order_incremental_cost * qty_2_order)
+        self.total_order_cost_per_item[item.id] += (self.order_setup_cost + self.order_incremental_cost * qty_2_order)
         lead_time = item.lead_time()
         self.delta_time_last_order[item.id] = self.env.now - self.time_last_order[item.id]
         self.time_last_order[item.id] = self.env.now
@@ -218,7 +218,7 @@ class Warehouse:
         :return:
         """
         while True:
-            demand_inter_arrival_time = item.demand_inter_arrival_mean_time()
+            demand_inter_arrival_time = item.demand_inter_arrival_time()
             yield self.env.timeout(demand_inter_arrival_time)
             pop, weights = item.demand_distribution
             demand_size = random.choices(pop, weights=weights, k=1)[0]

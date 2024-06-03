@@ -18,7 +18,6 @@ class AgentsLoader:
         self.agents.append(PpoMlp())
         self.agents.append(DqnMlp())
         self.agents.append(A2cMlp())
-        self.agents.append(DdpgMlp())
         self.agents.append(SacMlp())
 
     def load_weights(self):
@@ -36,6 +35,7 @@ class AgentsLoader:
 
         for agent in self.agents:
             self.w_env.reset()
+            print(f"Training agent: {agent}")
             agent.train(w_env=self.w_env, episode_duration=episode_duration, plot_rewards=plot_rewards)
             agent.save_model()
 
