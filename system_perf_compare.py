@@ -1,4 +1,14 @@
+"""
+Runnare in modo statisticamente corretto il sistema con agent o con policy fissa.
+Fare confronto printando a fine simulazione a quanto ammonta il costo totale usando la media dei valori
+con la lista dei seed.
+
+Warehouse -> sistema con gli agent
+Warehouse_S -> sistema con policy fissa
+"""
+
 from system.Inventory_Multi_Item import Warehouse
+from system.Inventory_Multi_Item_S import Warehouse as Warehouse_S
 from system.InventoryEnv_Multi_Item import WarehouseEnv
 from system.Item import Item
 from agents.AgentsLoader import AgentsLoader
@@ -14,18 +24,8 @@ logging_path = 'log/output.log'
 clean_plot_directory()
 # Clean log
 clean_log_file(logging_path)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.FileHandler(logging_path),
-        logging.StreamHandler()
-    ]
-)
-# Logger creation
-logger = logging.getLogger(__name__)
+# Simulation time - 5 years
+sim_time = 365*5
 
 # Define the items
 item_1 = Item(
@@ -33,14 +33,18 @@ item_1 = Item(
     description="Iphone 15",
     lead_time=lambda: random.uniform(15, 30),
     demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]]
+    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]],
+    s_min=20,
+    s_max=60
 )
 item_2 = Item(
     id="2",
     description="AirPods Pro",
     lead_time=lambda: random.uniform(6, 21),
     demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]]
+    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]],
+    s_min=20,
+    s_max=60
 )
 items = [item_1, item_2]
 # Inventory initial position
@@ -50,6 +54,16 @@ inventory_position_distribution_2 = lambda: random.uniform(-76.125, 76.125)
 env = simpy.Environment()
 # Define Warehouse
 w_simpy_env = Warehouse(
+    id="Warehouse - Training",
+    env=env,
+    items=items,
+    inventory_levels=[inventory_position_distribution_1, inventory_position_distribution_2],
+    order_setup_cost=10,
+    order_incremental_cost=3,
+    holding_cost=1,
+    shortage_cost=7
+)
+w_simpy_env_S = Warehouse_S(
     id="Warehouse - Training",
     env=env,
     items=items,
@@ -69,34 +83,16 @@ w_gym_env = WarehouseEnv(
     warehouse=w_simpy_env,
     step_duration=1, # 1 Day, add delay to process last cost
 )
-# Load all agents' model
+
+# Load best agent
 al = AgentsLoader(w_gym_env)
-al.load_weights()
+agent = al.load_weight(model_id="a2c_mlp")
+obs, _ = w_gym_env.reset()
+for _ in range(sim_time):
+    actions, _states = agent.predict(obs)
+    obs, rewards, done, truncated, info = w_gym_env.step(actions)
+print("RL Agent total cost: ",w_gym_env.warehouse.total_cost)
 
-# Measure the result of the simulation with RL agent
-for agent in al.agents:
-    obs, _ = w_gym_env.reset()
-    logger.info(agent)
-    headers = ["Inventory position Item 1", "Delta Quantity Ordered Item 1",
-               "Delta Time Last Order Item 1", "Delta Orders Counter Item 1",
-               "Order Rate Item 1",
-               "Inventory position Item 2", "Delta Quantity Ordered Item 2",
-               "Delta Time Last Order Item 2", "Delta Orders Counter Item 2",
-               "Order Rate Item 2",
-               "Action Item 1", "Action Item 2",
-               "Reward"]
+# Run policy fixed system for given amount of time
+# TODO
 
-    prediction = []
-    prediction.append([*obs, 0, 0, 0])
-    for _ in range(100):
-        actions, _states = agent.predict(obs)
-        obs, rewards, done, truncated, info = w_gym_env.step(actions)
-        prediction.append([*obs, *actions, rewards])
-
-    tab = tabulate(
-        prediction,
-        headers=headers,
-        tablefmt="fancy_grid"
-    )
-
-# Measure the result of the simulation with policy_fixed system

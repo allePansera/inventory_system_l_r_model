@@ -59,5 +59,15 @@ class AgentsLoader:
         end = datetime.datetime.now()
         return (end-start).total_seconds()
 
+    def load_weight(self, model_id: str = "") -> Agent:
+        """
+        Load weight for a single agent and return it.
+        :param model_id: model to load weights for
+        :return: agent loaded instance
+        """
+        for agent in self.agents:
+            if agent.id == model_id:
+                agent.load_model(w_env=self.w_env)
+                return agent
 
 

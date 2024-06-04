@@ -1,3 +1,5 @@
+import random
+
 from system.Inventory_Multi_Item import Warehouse
 from gymnasium import spaces
 import simpy
@@ -32,8 +34,9 @@ class WarehouseEnv(gym.Env):
             ])
         return np.array(obs, dtype=np.float32)
 
-    def reset(self, **kwargs):
+    def reset(self, seed=42, **kwargs):
         self.warehouse.env = simpy.Environment()
+        self.warehouse.env.seed(seed)
         self.warehouse.reset_system_attributes()
         self.warehouse.run_processes()
         return self._get_observation(), {}
