@@ -24,7 +24,9 @@ class RewardCallback(BaseCallback):
         ax2 = ax1.twinx()
         color = 'tab:red'
         ax2.set_ylabel('Action', color=color)
-        ax2.plot(self.actions, color=color)
+        for i, actions in enumerate(self.actions):
+            if len(actions) == 2:
+                ax2.plot(range(len(actions)), actions, label=f'Action {i + 1}')
         ax2.tick_params(axis='y', labelcolor=color)
         fig.tight_layout()
         plt.title(f'{self.description} Training Rewards and Actions over Time')

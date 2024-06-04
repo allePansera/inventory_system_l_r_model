@@ -105,7 +105,7 @@ class Warehouse:
     def total_items_ordered(self):
         return sum(self.items_ordered_currently[item.id] for item in self.items)
 
-    @property
+
     def turnover_rate(self, item: Item):
         try:
             avg_inventory = statistics.mean([el[1] for el in self.it[item.id]])
@@ -116,7 +116,7 @@ class Warehouse:
         except statistics.StatisticsError:
             return 0
 
-    @property
+
     def order_rate(self, item: Item):
         try:
             order_rates = self.items_ordered_currently[item.id]/self.orders_counter_currently[item.id]
@@ -195,7 +195,7 @@ class Warehouse:
 
         self.state[item.id].qty_ordered_until_now = self.items_ordered_currently[item.id]
         self.state[item.id].orders_counter = self.orders_counter_currently[item.id]
-        self.state[item.id].order_rate = self.order_rate[item.id]
+        self.state[item.id].order_rate = self.order_rate(item)
 
         if self.debug_mode: print(f"DDT Printed from supplier for item {item}...")
         if self.debug_mode: print(f"Estimated waiting time: {lead_time}")
@@ -207,8 +207,8 @@ class Warehouse:
 
         self.state[item.id].qty_ordered_until_now = self.items_ordered_currently[item.id]
         self.state[item.id].orders_counter = self.orders_counter_currently[item.id]
-        self.state[item.id].delta_time_last_order = self.delta_time_last_order
-        self.state[item.id].order_rate = self.order_rate[item.id]
+        self.state[item.id].delta_time_last_order = self.delta_time_last_order[item.id]
+        self.state[item.id].order_rate = self.order_rate(item)
 
     def demand_generator(self, item: Item) -> None:
         """
@@ -276,14 +276,14 @@ class Warehouse:
         Total shortage cost (€): {round(self.total_shortage_cost, 2)}
         ---
         """
-        for idx in range(len(self.inventory_levels)):
+        for item in self.items:
             outcome += f"""
-            Item {idx}:
-            Final Inventory level: {self.inventory_levels[idx]}
-            Total Items Ordered (delta): {self.items_ordered_currently[idx]}
-            Total Orders (delta): {self.orders_counter_currently[idx]}
-            Last time ordered (delta): {self.delta_time_last_order}
-            Turnover rate: {round(self.turnover_rate[idx], 2)}
-            Order rate: {round(self.order_rate[idx], 2)}
+            Item {item}:
+            Final Inventory level: {self.inventory_levels[item.id]}
+            Total Items Ordered (delta): {self.items_ordered_currently[item.id]}
+            Total Orders (delta): {self.orders_counter_currently[item.id]}
+            Last time ordered (delta): {self.delta_time_last_order[item.id]}
+            Turnover rate: {round(self.turnover_rate(item), 2)}
+            Order rate: {round(self.order_rate(item), 2)}
             """
         return outcome

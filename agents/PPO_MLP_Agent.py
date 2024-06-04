@@ -2,6 +2,7 @@ from stable_baselines3 import PPO
 from agents.AgentAbs import Agent
 from agents.Policy import CustomLSTMExtractor
 from agents.Callback import RewardCallback
+from stable_baselines3.common.callbacks import CheckpointCallback
 import gymnasium as gym
 
 
@@ -129,6 +130,8 @@ class PpoMlp(Agent):
         self.model = None
         self.w_env = None
         self.reward_callback = None
+        self.checkpoint_callback = None
+        self.id = "ppo_mlp"
 
     def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True):
         """
@@ -146,8 +149,14 @@ class PpoMlp(Agent):
         )
         self.model = PPO("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
         self.reward_callback = RewardCallback("PPO")
+        self.checkpoint_callback = CheckpointCallback(
+            save_freq=1000,
+            save_path="models/checkpoints",
+            name_prefix=self.id
+        )
         self.model.learn(total_timesteps=episode_duration,
-                         callback=self.reward_callback)
+                         callback=[self.reward_callback, self.checkpoint_callback]
+        )
         if plot_rewards:
             self.reward_callback.plot_rewards()
 

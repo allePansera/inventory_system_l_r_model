@@ -1,38 +1,8 @@
 ToDo:
 - Gestire i seed nella reset
-- Sistema multi env con Gym
-- Riformulare i parametri di tutte le classi con direttive del prof e multi-item
-- Checkpoint training
+- Trovare nuovi agenti che supportino il multi discrete.
+- Fixare il plot della reward
 - Fare inference e misurare le performance con metodi di analisi
 - Testare nuovi iper-parametri e comprenderne l'applicazione
 - Fare studio della variazione dei parametri con Es_d
-- Fare documentazione per A2C, DDPG, SAC, TD3 sulla falsa riga di quella già effettuata
-
-
-Consegna:
-Demand inter-arrival times: exponential random variable, lambda 0.1
-- K = 10
-- i = 3
-- h = 1
-- π = 7
-- First product demand distribution:
-o � = #
-1			�. �. 		1/6
-2			�. �		1/3
-3			�. �. 		1/3
-4			�. �. 		1/6
-o Lead Time: U(0.5;1)
-- Second product demand distribution:
-o � = #
-5			�. �. 		1/8
-4			�. �		1/2
-3			�. �. 		1/4
-2			�. �. 		1/8
-o Lead Time: U(0.2;0.7)
-
-Domanda:
-
-come gestiamo l'arrivo del cliente.
-Questo entra e prende più merci oppure servono 2 demand con distribuzioni differenti?
-
-
+- Fare documentazione di tutti gli agent

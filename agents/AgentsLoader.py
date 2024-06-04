@@ -3,8 +3,10 @@ from agents.PPO_MLP_Agent import PpoMlp
 from agents.A2C_MLP_Agent import A2cMlp
 from agents.SAC_MLP_Agent import SacMlp
 from agents.AgentAbs import Agent
-import gym
+import gymnasium as gym
 import datetime
+import os
+import shutil
 
 
 class AgentsLoader:
@@ -16,9 +18,9 @@ class AgentsLoader:
 
     def __load_agents(self):
         self.agents.append(PpoMlp())
-        self.agents.append(DqnMlp())
+        # self.agents.append(DqnMlp())
         self.agents.append(A2cMlp())
-        self.agents.append(SacMlp())
+        # self.agents.append(SacMlp())
 
     def load_weights(self):
         for agent in self.agents:
@@ -36,8 +38,27 @@ class AgentsLoader:
         for agent in self.agents:
             self.w_env.reset()
             print(f"Training agent: {agent}")
-            agent.train(w_env=self.w_env, episode_duration=episode_duration, plot_rewards=plot_rewards)
-            agent.save_model()
+            try:
+                # Check if previous checkpoint exists...
+                checkpoint_dir = f"models/checkpoints/"
+                latest_model_path = None
+                if os.path.exists(checkpoint_dir):
+                    models = [f"models/checkpoints/{f}" for f in os.listdir(checkpoint_dir) if f.startswith(agent.id)]
+                    if models:
+                        latest_model_path = max(models, key=os.path.getctime)
+
+                if latest_model_path:
+                    agent.load_model(w_env=self.w_env, path=latest_model_path)
+                    print(f"Loaded model from {latest_model_path}")
+                # Train the agent
+                agent.train(w_env=self.w_env, episode_duration=episode_duration, plot_rewards=plot_rewards)
+                agent.save_model()
+                # Remove checkpoint if exists since i have full model saved
+                if os.path.exists(checkpoint_dir):
+                    shutil.rmtree(checkpoint_dir)
+
+            except KeyboardInterrupt:
+                agent.save_model(path=f"models/checkpoints/{agent.id}_truncated")
 
         end = datetime.datetime.now()
         return (end-start).total_seconds()
