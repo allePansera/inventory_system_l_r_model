@@ -105,7 +105,6 @@ class Warehouse:
     def total_items_ordered(self):
         return sum(self.items_ordered_currently[item.id] for item in self.items)
 
-
     def turnover_rate(self, item: Item):
         try:
             avg_inventory = statistics.mean([el[1] for el in self.it[item.id]])
@@ -115,7 +114,6 @@ class Warehouse:
             return 0
         except statistics.StatisticsError:
             return 0
-
 
     def order_rate(self, item: Item):
         try:
@@ -156,7 +154,7 @@ class Warehouse:
     def day_total_cost(self) -> [float]:
         return self.daily_total_cost
 
-    def take_action(self, action: [int], item: Item):
+    def take_action(self, action: int, item: Item):
         """
         Perform an order given an item item.
         :param action: qty to order per each item

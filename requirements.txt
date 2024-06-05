@@ -8,3 +8,4 @@ gym
 tabulate
 gymna
 stable-baselines
+tqdm

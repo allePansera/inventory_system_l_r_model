@@ -16,7 +16,7 @@ class WarehouseEnv(gym.Env):
         super(WarehouseEnv, self).__init__()
         self.warehouse = warehouse
         self.state = self.warehouse.state
-        self.action_space = spaces.MultiDiscrete([75*2, 76.125*2])
+        self.action_space = spaces.MultiDiscrete([75*2, 76*2])
         self.step_duration = step_duration
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5 * len(self.warehouse.items),), dtype=np.float32)
         self.reward = 0
@@ -25,24 +25,33 @@ class WarehouseEnv(gym.Env):
     def _get_observation(self):
         obs = []
         for item in self.warehouse.items:
-            obs.extend([
-                self.warehouse.state[item.id].ip,
-                self.warehouse.state[item.id].qty_ordered_until_now,
-                self.warehouse.state[item.id].delta_time_last_order,
-                self.warehouse.state[item.id].orders_counter,
-                self.warehouse.state[item.id].order_rate
-            ])
+            item_id = item.id
+            state = self.warehouse.state[item_id]
+            obs.extend((
+                state.ip,
+                state.qty_ordered_until_now,
+                state.delta_time_last_order,
+                state.orders_counter,
+                state.order_rate
+            ))
         return np.array(obs, dtype=np.float32)
 
     def reset(self, seed=42, **kwargs):
+        random.seed(seed)
         self.warehouse.env = simpy.Environment()
-        self.warehouse.env.seed(seed)
         self.warehouse.reset_system_attributes()
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, actions):
+    def step(self, actions, done_steps: int = 365*3):
+        """
+        :param actions: list of action to take
+        :param done_steps: time to run before done for episode. Learn is mush bigger.
+        :return:
+        """
         info = {}
+        done = False
+        truncated = False
         for idx, action in enumerate(actions):
             item = self.warehouse.items[idx]
             info[f'stock_before_action_item_{item}'.replace(" ","")] = self.state[item.id].ip
@@ -53,5 +62,5 @@ class WarehouseEnv(gym.Env):
         self.warehouse.env.run(until=self.end+self.step_duration)
         self.end = self.warehouse.env.now
         self.warehouse.update_costs()
-        self.reward = -1*self.warehouse.day_total_cost[-1]
+        self.reward = -self.warehouse.day_total_cost[-1]
         return self._get_observation(), self.reward, False, False, info

@@ -70,6 +70,7 @@ class Warehouse:
         self.run_processes()
 
     def run_processes(self):
+        self.env.process(self.update_costs())
         for item in self.items:
             self.env.process(self.demand_generator(item))
             self.env.process(self.order_qty(item))
@@ -160,11 +161,13 @@ class Warehouse:
         Called by Gym to update costs at each episode
         :return:
         """
-        if len(self.daily_total_cost) == 0:
-            self.daily_total_cost.append(round(self.total_cost, 2))
-        else:
-            previous_cost = sum(self.daily_total_cost)
-            self.daily_total_cost.append(round(self.total_cost-previous_cost, 2))
+        while True:
+            yield self.env.timeout(self.day_duration)
+            if len(self.daily_total_cost) == 0:
+                self.daily_total_cost.append(round(self.total_cost, 2))
+            else:
+                previous_cost = sum(self.daily_total_cost)
+                self.daily_total_cost.append(round(self.total_cost-previous_cost, 2))
 
     def order_qty(self, item: Item) -> None:
         """

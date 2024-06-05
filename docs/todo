@@ -7,4 +7,12 @@ ToDo:
 - Fare studio della variazione dei parametri con Es_d
 - Fare documentazione di tutti gli agent
 
-Domande: dobbiamo in caso battezzare un S_min e un S_max
+- RL Zo3 benchmark per performance tra diversi modelli
+- Ris con discrete e multi discrete
+- Rimettere MLP
+- Smin e Smax sia per A che per B e fare confronto (a tentativi)
+- pulire attr. unused
+- tutti i costi li approssimo all'ultimo istante
+- devo gestire il done, non basta il time_step
+- posso troncare se IP va sotto soglie positive e negative tronco
+- warmup period dentro al confronto
