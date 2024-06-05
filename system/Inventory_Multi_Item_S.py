@@ -14,7 +14,7 @@ class Warehouse:
         id: int,
         env: simpy.Environment,
         inventory_levels: List[Callable[[], float]],
-        items: List[Item] = [],
+        items: List[Item] = (),
         order_setup_cost: float = 10,
         order_incremental_cost: float = 3,
         holding_cost: float = 1,

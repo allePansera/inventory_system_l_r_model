@@ -1,5 +1,7 @@
 from agents.PPO_MLP_Agent import PpoMlp
 from agents.A2C_MLP_Agent import A2cMlp
+from agents.SAC_MLP_Agent import SacMlp
+from agents.DQN_MLP_Agent import DqnMlp
 from agents.AgentAbs import Agent
 import gymnasium as gym
 import datetime
@@ -17,12 +19,14 @@ class AgentsLoader:
     def __load_agents(self):
         self.agents.append(PpoMlp())
         self.agents.append(A2cMlp())
+        self.agents.append(DqnMlp())
+        self.agents.append(SacMlp())
 
     def load_weights(self):
         for agent in self.agents:
             agent.load_model(w_env=self.w_env)
 
-    def train(self, episode_duration: int = 1000, plot_rewards: bool = True) -> float:
+    def train(self, episode_duration: int = 365 * 1000, plot_rewards: bool = True) -> float:
         """
         Train the agents and store the respective models.
         :param episode_duration: how many episode run to find optimal policy and value function

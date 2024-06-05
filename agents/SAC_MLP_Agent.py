@@ -124,7 +124,7 @@ class SacMlp(Agent):
             features_extractor_class=CustomLSTMExtractor,
             features_extractor_kwargs=dict(features_dim=64)
         )
-        self.model = SAC("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
+        self.model = SAC("MlpPolicy", self.w_env, verbose=1)
         self.reward_callback = RewardCallback("SAC")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

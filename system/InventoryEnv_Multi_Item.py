@@ -15,24 +15,23 @@ class WarehouseEnv(gym.Env):
     ) -> None:
         super(WarehouseEnv, self).__init__()
         self.warehouse = warehouse
-        self.state = self.warehouse.state
-        self.action_space = spaces.MultiDiscrete([75*2, 76*2])
+        self.action_space = spaces.Discrete(301)
         self.step_duration = step_duration
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5 * len(self.warehouse.items),), dtype=np.float32)
         self.reward = 0
+        self.beginning = self.warehouse.env.now
         self.end = self.warehouse.env.now
 
     def _get_observation(self):
         obs = []
         for item in self.warehouse.items:
             item_id = item.id
-            state = self.warehouse.state[item_id]
             obs.extend((
-                state.ip,
-                state.qty_ordered_until_now,
-                state.delta_time_last_order,
-                state.orders_counter,
-                state.order_rate
+                self.warehouse.inventory_levels[item_id],
+                self.warehouse.items_ordered_currently[item_id],
+                self.warehouse.delta_time_last_order[item_id],
+                self.warehouse.orders_counter_currently[item_id],
+                self.warehouse.order_rate(item)
             ))
         return np.array(obs, dtype=np.float32)
 
@@ -43,24 +42,21 @@ class WarehouseEnv(gym.Env):
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, actions, done_steps: int = 365*3):
+    def step(self, action: int, done_steps: int = 365*3, r_interval: [int] = [-500, +500]):
         """
-        :param actions: list of action to take
+        :param action: ty of item to order
         :param done_steps: time to run before done for episode. Learn is mush bigger.
+        :param r_interval: reward interval accepted before truncation
         :return:
         """
         info = {}
-        done = False
-        truncated = False
-        for idx, action in enumerate(actions):
-            item = self.warehouse.items[idx]
-            info[f'stock_before_action_item_{item}'.replace(" ","")] = self.state[item.id].ip
-            info[f'stock_after_action_item_{item}'.replace(" ","")] = self.state[item.id].ip + action
-            info[f'qty_2_order_item_{item}'.replace(" ","")] = action
-            self.warehouse.take_action(action, item)
-
+        idx = 1 if action >= 151 else 0
+        action = action % 151
+        item = self.warehouse.items[idx]
+        self.warehouse.take_action(action, item)
         self.warehouse.env.run(until=self.end+self.step_duration)
         self.end = self.warehouse.env.now
-        self.warehouse.update_costs()
-        self.reward = -self.warehouse.day_total_cost[-1]
-        return self._get_observation(), self.reward, False, False, info
+        self.reward = -self.warehouse.total_cost
+        done = True if self.warehouse.env.now-self.beginning >= done_steps else False
+        truncated = True if r_interval[0] <= self.reward <= r_interval[1] else False
+        return self._get_observation(), self.reward, done, truncated, info
