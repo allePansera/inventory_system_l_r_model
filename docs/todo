@@ -1,18 +1,7 @@
 ToDo:
-- Gestire i seed nella reset
-- Trovare nuovi agenti che supportino il multi discrete.
 - Fixare il plot della reward
-- Fare inference e misurare le performance con metodi di analisi
 - Testare nuovi iper-parametri e comprenderne l'applicazione
-- Fare studio della variazione dei parametri con Es_d
 - Fare documentazione di tutti gli agent
-
 - RL Zo3 benchmark per performance tra diversi modelli
-- Ris con discrete e multi discrete
-- Rimettere MLP
 - Smin e Smax sia per A che per B e fare confronto (a tentativi)
-- pulire attr. unused
-- tutti i costi li approssimo all'ultimo istante
-- devo gestire il done, non basta il time_step
-- posso troncare se IP va sotto soglie positive e negative tronco
 - warmup period dentro al confronto

@@ -42,11 +42,11 @@ class WarehouseEnv(gym.Env):
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, action: int, done_steps: int = 365*3, r_interval: [int] = [-500, +500]):
+    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-500, +500]):
         """
         :param action: ty of item to order
         :param done_steps: time to run before done for episode. Learn is mush bigger.
-        :param r_interval: reward interval accepted before truncation
+        :param il_interval: interval level interval accepted before truncation
         :return:
         """
         info = {}
@@ -58,5 +58,5 @@ class WarehouseEnv(gym.Env):
         self.end = self.warehouse.env.now
         self.reward = -self.warehouse.total_cost
         done = True if self.warehouse.env.now-self.beginning >= done_steps else False
-        truncated = True if r_interval[0] <= self.reward <= r_interval[1] else False
+        truncated = True if il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1] else False
         return self._get_observation(), self.reward, done, truncated, info
