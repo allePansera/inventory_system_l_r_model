@@ -37,12 +37,13 @@ class WarehouseEnv(gym.Env):
 
     def reset(self, seed=42, **kwargs):
         random.seed(seed)
+        self.beginning = self.warehouse.env.now
         self.warehouse.env = simpy.Environment()
         self.warehouse.reset_system_attributes()
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-500, +500]):
+    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-10000, +10000]):
         """
         :param action: ty of item to order
         :param done_steps: time to run before done for episode. Learn is mush bigger.
@@ -58,5 +59,6 @@ class WarehouseEnv(gym.Env):
         self.end = self.warehouse.env.now
         self.reward = -self.warehouse.total_cost
         done = True if self.warehouse.env.now-self.beginning >= done_steps else False
-        truncated = True if il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1] else False
+        truncated = False if il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1] else True
+        truncated = False
         return self._get_observation(), self.reward, done, truncated, info

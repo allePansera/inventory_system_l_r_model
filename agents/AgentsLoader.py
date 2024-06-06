@@ -20,7 +20,7 @@ class AgentsLoader:
         self.agents.append(PpoMlp())
         self.agents.append(A2cMlp())
         self.agents.append(DqnMlp())
-        self.agents.append(SacMlp())
+        # self.agents.append(SacMlp())
 
     def load_weights(self):
         for agent in self.agents:
@@ -53,6 +53,7 @@ class AgentsLoader:
                 # Train the agent
                 agent.train(w_env=self.w_env, episode_duration=episode_duration, plot_rewards=plot_rewards)
                 agent.save_model()
+
                 # Remove checkpoint if exists since i have full model saved
                 if os.path.exists(checkpoint_dir):
                     shutil.rmtree(checkpoint_dir)
