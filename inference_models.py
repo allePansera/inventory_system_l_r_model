@@ -32,15 +32,15 @@ item_1 = Item(
     id="1",
     description="Iphone 15",
     lead_time=lambda: random.uniform(15, 30),
-    demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]]
+    demand_inter_arrival_time=lambda: random.expovariate(lambd=1 / 3),
+    demand_distribution=[[1, 2, 3, 4], [1 / 3, 1 / 6, 1 / 6, 1 / 3]]
 )
 item_2 = Item(
     id="2",
     description="AirPods Pro",
     lead_time=lambda: random.uniform(6, 21),
-    demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]]
+    demand_inter_arrival_time=lambda: random.expovariate(lambd=1 / 3),
+    demand_distribution=[[1, 2, 3, 4], [1 / 3, 1 / 6, 1 / 6, 1 / 3]]
 )
 items = [item_1, item_2]
 # Inventory initial position
@@ -50,7 +50,7 @@ inventory_position_distribution_2 = lambda: random.uniform(-76.125, 76.125)
 env = simpy.Environment()
 # Define Warehouse
 w_simpy_env = Warehouse(
-    id="Warehouse - Training",
+    id="Warehouse - Inference",
     env=env,
     items=items,
     inventory_levels=[inventory_position_distribution_1, inventory_position_distribution_2],
@@ -62,12 +62,12 @@ w_simpy_env = Warehouse(
 # Define Warehouse Gym Env
 w_gym_env = WarehouseEnv(
     warehouse=w_simpy_env,
-    step_duration=1, # 1 Day, add delay to process last cost
+    step_duration=1,  # 1 Day, add delay to process last cost
 )
 # Define Warehouse Gym Env
 w_gym_env = WarehouseEnv(
     warehouse=w_simpy_env,
-    step_duration=1, # 1 Day, add delay to process last cost
+    step_duration=1,  # 1 Day, add delay to process last cost
 )
 # Load all agents' model
 al = AgentsLoader(w_gym_env)
