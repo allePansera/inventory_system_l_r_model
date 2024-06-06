@@ -2,7 +2,7 @@ from scipy import stats
 
 from system.Inventory_Multi_Item_S import Warehouse
 from system.Item import Item
-from utils import clean_plot_directory
+from utils import clean_plot_directory, generate_seeds
 from utils import clean_log_file
 from tabulate import tabulate
 import statistics
@@ -22,7 +22,7 @@ Possible combination
 """
 
 
-def plot_interaction(mean: list, s_min: int, s_max: int, d_min: int, d_max: int):
+def plot_interaction(mean: list, s_min: int, s_max: int, d_min: int, d_max: int, title: str = "Interaction"):
     """
     Plot the interaction between the two factors. Pleane notice that combinations are considerate as follow:
 
@@ -43,7 +43,7 @@ def plot_interaction(mean: list, s_min: int, s_max: int, d_min: int, d_max: int)
     x2 = [s_min, s_max]
     y2 = [mean[1], mean[3]]
     plt.plot(x2, y2, label=f'd = {d_max}')
-
+    plt.title(title)
     plt.legend()
     plt.show()
 
@@ -78,9 +78,9 @@ d_min_item_1 = 30
 d_max_item_1 = 50
 
 # Possibile minimum-maximum threshold
-s_min_item_2 = 5
-s_max_item_2 = 30
-d_min_item_2 = 30
+s_min_item_2 = 10
+s_max_item_2 = 20
+d_min_item_2 = 20
 d_max_item_2 = 50
 
 comb = {0: [(s_min_item_1, d_min_item_1), (s_min_item_1, d_max_item_1), (s_max_item_1, d_min_item_1), (s_max_item_1, d_max_item_1)],
@@ -91,7 +91,7 @@ R = {0: {}, 1: {}}
 # Month of simulation
 SIM_MONTH = 120
 # Seeds to use for env random simulation
-seeds = [42, 34, 58, 78, 11, 90, 25, 58, 90, 13]
+seeds: list[int] = generate_seeds(n=100)
 # Compute, per simulation response, the mean, the variance and the half-interval
 R_stats = {0: [], 1: []}
 # Expected effect
@@ -132,7 +132,7 @@ for item_idx in range(2):
                 env=env,
                 items=[items[item_idx]],
                 inventory_levels=[distributions[item_idx]],
-                order_setup_cost=10,
+                order_setup_cost=len(seeds),
                 order_incremental_cost=3,
                 holding_cost=1,
                 shortage_cost=7,
@@ -147,14 +147,14 @@ for item_idx in range(2):
         # Lecture 6.pptx
         avg_monthly_costs_sample_mean = statistics.mean(R[item_idx][i])
         avg_monthly_costs_sample_variance = statistics.variance(R[item_idx][i], xbar=avg_monthly_costs_sample_mean)
-        t = t_student_critical_value(alpha=0.05, n=10)
-        half_interval = t * np.sqrt(avg_monthly_costs_sample_variance / 10)
+        t = t_student_critical_value(alpha=0.05, n=len(seeds))
+        half_interval = t * np.sqrt(avg_monthly_costs_sample_variance / len(seeds))
         R_stats[item_idx].append({"Mean": avg_monthly_costs_sample_mean,
                                   "Variance": avg_monthly_costs_sample_variance,
                                   "Half-Interval": half_interval,
                                   "i": i, })
 
-# Compute e_s, e_d and e_sd 10 times
+# Compute e_s, e_d and e_sd len(seeds) times
 for item_idx in range(2):
     for i in range(len(seeds)):
         r_0, r_1, r_2, r_3 = R[item_idx][0][i], R[item_idx][1][i], R[item_idx][2][i], R[item_idx][3][i],
@@ -171,20 +171,20 @@ for item_idx in range(2):
     e_s_list = [e["e_s"] for e in E_stats[item_idx]]
     avg_e_s = statistics.mean(e_s_list)
     variance_e_s = statistics.variance(e_s_list, xbar=avg_e_s)
-    t = t_student_critical_value(alpha=0.05, n=10)
-    half_interval_s = t * np.sqrt(variance_e_s / 10)
+    t = t_student_critical_value(alpha=0.05, n=len(seeds))
+    half_interval_s = t * np.sqrt(variance_e_s / len(seeds))
 
     e_d_list = [e["e_d"] for e in E_stats[item_idx]]
     avg_e_d = statistics.mean(e_d_list)
     variance_e_d = statistics.variance(e_d_list, xbar=avg_e_d)
-    t = t_student_critical_value(alpha=0.05, n=10)
-    half_interval_d = t * np.sqrt(variance_e_d / 10)
+    t = t_student_critical_value(alpha=0.05, n=len(seeds))
+    half_interval_d = t * np.sqrt(variance_e_d / len(seeds))
 
     e_sd_list = [e["e_sd"] for e in E_stats[item_idx]]
     avg_e_sd = statistics.mean(e_sd_list)
     variance_e_sd = statistics.variance(e_sd_list, xbar=avg_e_sd)
-    t = t_student_critical_value(alpha=0.05, n=10)
-    half_interval_sd = t * np.sqrt(variance_e_sd / 10)
+    t = t_student_critical_value(alpha=0.05, n=len(seeds))
+    half_interval_sd = t * np.sqrt(variance_e_sd / len(seeds))
 
     table = tabulate(
         [[i, R_stats[item_idx][i]["Mean"], R_stats[item_idx][i]["Variance"], R_stats[item_idx][i]["Half-Interval"]] for i in range(4)],
@@ -202,8 +202,8 @@ for item_idx in range(2):
         tablefmt='pretty')
     logger.info("\n" + table)
     if item_idx == 0:
-        plot_interaction([R_stats[item_idx][i]["Mean"] for i in range(4)], s_min_item_1, s_max_item_1, d_min_item_1, d_max_item_1)
+        plot_interaction([R_stats[item_idx][i]["Mean"] for i in range(4)], s_min_item_1, s_max_item_1, d_min_item_1, d_max_item_1, title="Interaction Item 1")
     elif item_idx == 1:
-        plot_interaction([R_stats[item_idx][i]["Mean"] for i in range(4)], s_min_item_2, s_max_item_2, d_min_item_2, d_max_item_2)
+        plot_interaction([R_stats[item_idx][i]["Mean"] for i in range(4)], s_min_item_2, s_max_item_2, d_min_item_2, d_max_item_2, title="Interaction Item 2")
     else:
         raise ValueError("Item index not valid")
