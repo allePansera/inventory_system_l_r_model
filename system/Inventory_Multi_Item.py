@@ -91,7 +91,7 @@ class Warehouse:
     @property
     def total_shortage_cost(self) -> float:
         return sum(
-            min(self.inventory_levels[item.id], 0) * self.shortage_cost
+            -min(self.inventory_levels[item.id], 0) * self.shortage_cost
             for item in self.items
         )
 

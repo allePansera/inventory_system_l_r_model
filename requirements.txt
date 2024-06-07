@@ -9,3 +9,4 @@ tabulate
 gymna
 stable-baselines
 tqdm
+rl_zoo3

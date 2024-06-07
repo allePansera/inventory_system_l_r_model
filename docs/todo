@@ -1,7 +1,6 @@
 ToDo:
-- Fixare il plot della reward
+- Fare un sistema di confronto tra i modelli
 - Testare nuovi iper-parametri e comprenderne l'applicazione
 - Fare documentazione di tutti gli agent
-- RL Zo3 benchmark per performance tra diversi modelli
 - Smin e Smax sia per A che per B e fare confronto (a tentativi)
 - warmup period dentro al confronto
