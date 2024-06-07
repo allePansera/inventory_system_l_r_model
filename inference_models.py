@@ -87,7 +87,7 @@ for agent in al.agents:
                "Reward"]
 
     prediction = []
-    prediction.append([*obs, 0, 0, 0])
+    prediction.append([*obs, 0, 0])
     for _ in range(100):
         action, _state = agent.predict(obs)
         obs, rewards, done, truncated, info = w_gym_env.step(action)

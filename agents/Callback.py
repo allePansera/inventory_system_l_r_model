@@ -1,6 +1,6 @@
 from stable_baselines3.common.callbacks import BaseCallback
 from tqdm import tqdm
-from matplotlib.animation import FuncAnimation
+from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -95,4 +95,5 @@ class RewardCallback(BaseCallback):
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
         plt.show()
+        plt.savefig(f"plot/{datetime.now().strftime('%d%m%Y%H%M%S')}.png")
 
