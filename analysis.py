@@ -97,6 +97,7 @@ R_stats = {0: [], 1: []}
 # Expected effect
 E_stats = {0: [], 1: []}
 
+
 for item_idx in range(2):
     for i in range(len(comb[item_idx])):
         for index, seed in enumerate(seeds):
