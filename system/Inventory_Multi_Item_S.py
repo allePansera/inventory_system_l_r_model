@@ -176,6 +176,7 @@ class Warehouse:
         :return:
         """
         while True:
+            yield self.env.timeout(self.day_duration)
             if self.inventory_levels[item.id] < item.s_min:
                 qty_2_order = item.s_max - self.inventory_levels[item.id]
                 if self.debug_mode: print(f"{item} is under s_min, make an order of {qty_2_order} units")
@@ -222,17 +223,17 @@ class Warehouse:
     def system_description(self, output_path: str = "plot/"):
         fig, axs = plt.subplots(len(self.inventory_levels) + 1, 1, figsize=(12, 16))
 
-        for idx in range(len(self.inventory_levels)):
+        for idx, key in enumerate(self.inventory_levels):
             axs[idx].plot(
-                [it[0] for it in self.it[idx]],
-                [it[1] for it in self.it[idx]],
+                [it[0] for it in self.it[key]],
+                [it[1] for it in self.it[key]],
                 color='blue',
                 linewidth=2,
                 label=f'Inventory Position {idx}'
             )
             axs[idx].fill_between(
-                [it[0] for it in self.it[idx]],
-                [it[1] for it in self.it[idx]],
+                [it[0] for it in self.it[key]],
+                [it[1] for it in self.it[key]],
                 color='blue',
                 alpha=0.2,
                 label=f'Inventory Position {idx}'
