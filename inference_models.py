@@ -45,7 +45,7 @@ item_2 = Item(
 items = [item_1, item_2]
 # Inventory initial position
 inventory_position_distribution_1 = lambda: random.uniform(-75, 75)
-inventory_position_distribution_2 = lambda: random.uniform(-76.125, 76.125)
+inventory_position_distribution_2 = lambda: random.uniform(-75, 75)
 # Define Simpy environment
 env = simpy.Environment()
 # Define Warehouse

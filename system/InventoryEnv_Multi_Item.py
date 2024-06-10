@@ -61,7 +61,7 @@ class WarehouseEnv(gym.Env):
         truncated = not (il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1])
         if truncated:
             remaining_time_steps = self.warehouse.env.now-self.beginning
-            reward = self.truncated_cost()
+            reward = self.truncated_cost(remaining_time_steps)
         return self._get_observation(), reward, done, truncated, info
 
     def truncated_cost(self, remaining_time: int, weight: int = 100):
@@ -69,5 +69,11 @@ class WarehouseEnv(gym.Env):
 
         :param remaining_time: time step remaining after truncation
         :param weight: weight to use to increment the cost of the truncation
-        :return:
+        :return: weighted shortage cost considering time and proportional cost
         """
+
+        shortage_cost = sum(
+            -min(self.warehouse.inventory_levels[item.id], 0) * self.warehouse.shortage_cost
+            for item in self.warehouse.items
+        )
+        return shortage_cost * remaining_time * weight
