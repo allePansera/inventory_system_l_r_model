@@ -4,3 +4,14 @@ ToDo:
 - Fare documentazione di tutti gli agent
 - Smin e Smax sia per A che per B e fare confronto (a tentativi)
 - warmup period dentro al confronto
+
+# Note pro:
+- Provare a gestire truncated con delle return molto negative
+- Fare funzione di costo di perdita molto negativa
+- Rimango a livello minimo per il resto della mia simulazione.
+Costo * costo shortage * tempo -> non basta;
+Serve maggiore penalty rispetto a shortage default.
+Guardiamo il ritorno e deve almeno essere un 100x
+- Pulire kwargs
+- Controllare Normalize Images
+- Se non miglioro normalizzare il reward in un range tra 0 e 1
