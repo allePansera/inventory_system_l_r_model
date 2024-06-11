@@ -37,8 +37,8 @@ class WarehouseEnv(gym.Env):
 
     def reset(self, seed=42, **kwargs):
         random.seed(seed)
-        self.beginning = self.warehouse.env.now
         self.warehouse.env = simpy.Environment()
+        self.beginning = self.warehouse.env.now
         self.warehouse.reset_system_attributes()
         self.warehouse.run_processes()
         return self._get_observation(), {}
@@ -55,10 +55,25 @@ class WarehouseEnv(gym.Env):
         action = action % 151
         item = self.warehouse.items[idx]
         self.warehouse.take_action(action, item)
-        self.warehouse.env.run(until=self.end+self.step_duration)
-        self.end = self.warehouse.env.now
-        self.reward = -self.warehouse.total_cost
+        self.warehouse.env.run(until=self.warehouse.env.now+self.step_duration)
+        reward = -self.warehouse.total_cost
         done = True if self.warehouse.env.now-self.beginning >= done_steps else False
-        truncated = False if il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1] else True
-        truncated = False
-        return self._get_observation(), self.reward, done, truncated, info
+        truncated = not (il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1])
+        if truncated:
+            remaining_time_steps = self.warehouse.env.now-self.beginning
+            reward = self.truncated_cost(remaining_time_steps)
+        return self._get_observation(), reward, done, truncated, info
+
+    def truncated_cost(self, remaining_time: int, weight: int = 100):
+        """
+
+        :param remaining_time: time step remaining after truncation
+        :param weight: weight to use to increment the cost of the truncation
+        :return: weighted shortage cost considering time and proportional cost
+        """
+
+        shortage_cost = sum(
+            -min(self.warehouse.inventory_levels[item.id], 0) * self.warehouse.shortage_cost
+            for item in self.warehouse.items
+        )
+        return shortage_cost * remaining_time * weight

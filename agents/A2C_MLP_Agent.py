@@ -119,11 +119,6 @@ class A2cMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        # Policy keyword arguments
-        policy_kwargs = dict(
-            features_extractor_class=CustomLSTMExtractor,
-            features_extractor_kwargs=dict(features_dim=64)
-        )
         self.model = A2C("MlpPolicy", self.w_env, verbose=0)
         self.reward_callback = RewardCallback("A2C")
         self.checkpoint_callback = CheckpointCallback(

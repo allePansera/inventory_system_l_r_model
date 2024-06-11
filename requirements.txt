@@ -6,7 +6,7 @@ matplotlib~=3.9.0
 stable-baselines3[extra]
 gym
 tabulate
-gymna
+gymnasium
 stable-baselines
 tqdm
 rl_zoo3
