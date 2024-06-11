@@ -98,8 +98,11 @@ R_stats = {0: [], 1: []}
 E_stats = {0: [], 1: []}
 
 
+# Select an item
 for item_idx in range(2):
+    # Select a combination (s, d) in [(-,-), (-,+), (+,-), (+,+)]
     for i in range(len(comb[item_idx])):
+        # Compute analisys of Item item_idx with combination i
         for index, seed in enumerate(seeds):
             random.seed(seed)
             # Define the items
