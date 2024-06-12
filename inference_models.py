@@ -64,11 +64,7 @@ w_gym_env = WarehouseEnv(
     warehouse=w_simpy_env,
     step_duration=1,  # 1 Day, add delay to process last cost
 )
-# Define Warehouse Gym Env
-w_gym_env = WarehouseEnv(
-    warehouse=w_simpy_env,
-    step_duration=1,  # 1 Day, add delay to process last cost
-)
+
 # Load all agents' model
 al = AgentsLoader(w_gym_env)
 al.load_weights()

@@ -43,7 +43,7 @@ class WarehouseEnv(gym.Env):
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-10000, +10000]):
+    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-5000, +5000]):
         """
         :param action: ty of item to order
         :param done_steps: time to run before done for episode. Learn is mush bigger.
@@ -64,14 +64,14 @@ class WarehouseEnv(gym.Env):
             reward = self.truncated_cost(remaining_time_steps)
         return self._get_observation(), reward, done, truncated, info
 
-    def truncated_cost(self, remaining_time: int, weight: int = 100):
+    def truncated_cost(self, remaining_time: int, weight: int = 10):
         """
 
         :param remaining_time: time step remaining after truncation
         :param weight: weight to use to increment the cost of the truncation
         :return: weighted shortage cost considering time and proportional cost
         """
-
+        # avg_fixed_policy -> -21000
         shortage_cost = sum(
             -min(self.warehouse.inventory_levels[item.id], 0) * self.warehouse.shortage_cost
             for item in self.warehouse.items

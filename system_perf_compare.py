@@ -33,7 +33,7 @@ item_1 = Item(
     demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
     demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]],
     s_min=20,
-    s_max=60
+    s_max=42
 )
 item_2 = Item(
     id="2",
@@ -41,8 +41,8 @@ item_2 = Item(
     lead_time=lambda: random.uniform(6, 21),
     demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
     demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]],
-    s_min=20,
-    s_max=60
+    s_min=6,
+    s_max=27
 )
 items = [item_1, item_2]
 # Inventory initial position
@@ -82,6 +82,7 @@ for seed in tqdm(seeds):
         actions, _states = agent.predict(obs)
         obs, rewards, done, truncated, info = w_gym_env.step(actions)
     rl_agent_costs.append(w_gym_env.warehouse.total_cost)
+    w_gym_env.warehouse.reset_system_attributes()
 
 # Policy fixed agent
 print("Running policy fixed agent...")
@@ -102,7 +103,7 @@ for seed in tqdm(seeds):
     )
     # Run policy fixed system for given amount of time
     w_simpy_env_S.env.run(until=sim_time)
-    policy_fixed_costs.append(w_gym_env.warehouse.total_cost)
+    policy_fixed_costs.append(w_simpy_env_S.total_cost)
 
 avg_policy_fixed = statistics.mean(policy_fixed_costs)
 var_policy_fixed = np.var(policy_fixed_costs)
