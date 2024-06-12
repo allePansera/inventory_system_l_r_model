@@ -76,4 +76,5 @@ class WarehouseEnv(gym.Env):
             -min(self.warehouse.inventory_levels[item.id], 0) * self.warehouse.shortage_cost
             for item in self.warehouse.items
         )
-        return shortage_cost * remaining_time * weight
+        output = shortage_cost * remaining_time * weight
+        return output
