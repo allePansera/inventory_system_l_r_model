@@ -1,4 +1,4 @@
-# Alessandro Pansera - Inventory System
+# Alessandro Pansera/Mattia Bertacchini - Inventory System
 ## System's input description
 - Project has been realized considering day as UoM. Suppose 1 Month = 30 Days for conversion.
 - Items are apple's products... not my personal choice...
@@ -8,8 +8,6 @@
 
 On average, obtained best results for the system are:
 
-- Item 0: s=20, S=42 (d=22)
-- Item 1: s=6, S=27 (d=21)
+- [Item 0: s=20, S=42 (d=22)](docs/2k_factorial_design/item_0_analysis.png)
+- [Item 1: s=6, S=27 (d=21)](docs/2k_factorial_design/item_0_analysis.png)
 
-<img src="/docs/2k_factorial_design/item_0_analysis.png" alt="item 0">
-<img src="/docs/2k_factorial_design/item_1_analysis.png" alt="item 1">
