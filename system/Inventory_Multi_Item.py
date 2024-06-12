@@ -49,7 +49,7 @@ class Warehouse:
 
         # Handle all item processes
         self.run_processes()
-        self.process_list = []
+
 
     def run_processes(self):
         for item in self.items:
@@ -71,9 +71,13 @@ class Warehouse:
         self.time_last_order = self.total_order_cost_per_item.copy()
         self.delta_time_last_order = self.total_order_cost_per_item.copy()
         self.orders_counter_currently = self.total_order_cost_per_item.copy()
+
+        if not hasattr(self, 'process_list'): self.process_list = []
+
         # Clean all processes
         for pid in self.process_list:
             pid.interrupt()
+            self.process_list.remove(pid)
 
     def order_rate(self, item: Item):
         try:
