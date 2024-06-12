@@ -120,7 +120,7 @@ for item_idx in range(2):
         print(f"\nCombination: {comb_key} - {comb_list}")
         # Select a combination (s, d)
         for comb in comb_list:
-            # Compute n=10 analisys for each combination
+            # Compute n=10 analysis for each combination
             for index in tqdm(range(len(seeds))):
                 seed = seeds[index]
                 random.seed(seed)
