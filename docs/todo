@@ -1,10 +1,9 @@
 ToDo:
-- Gestire i seed nella reset
-- Trovare nuovi agenti che supportino il multi discrete.
-- Fixare il plot della reward
-- Fare inference e misurare le performance con metodi di analisi
+- Fare un sistema di confronto tra i modelli
 - Testare nuovi iper-parametri e comprenderne l'applicazione
-- Fare studio della variazione dei parametri con Es_d
 - Fare documentazione di tutti gli agent
+- Smin e Smax sia per A che per B e fare confronto (a tentativi)
+- warmup period dentro al confronto
 
-Domande: dobbiamo in caso battezzare un S_min e un S_max
+# Note pro:
+- Normalizzazione

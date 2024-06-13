@@ -103,6 +103,17 @@ class A2cMlp(Agent):
         Description: The exponent determining the degree of prioritization. A value of 0 means no prioritization, and a value closer to 1 means higher prioritization of important experiences.
         Default: 0.6
     """
+    params = {
+        'learning_rate': 0.05,  # α
+        'n_steps': 16,  # number of steps to unroll the network for
+        'gamma': 0.99,  # discount factor
+        'gae_lambda': 0.95,  # λ
+        'ent_coef': 0.0,  # entropy coefficient
+        'vf_coef': 1.0,  # value function coefficient
+        'max_grad_norm': 2.0,  # max gradient norm
+        'normalize_advantage': False,  # normalize advantage
+    }
+
     def __init__(self):
         self.model = None
         self.w_env = None
@@ -119,12 +130,7 @@ class A2cMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        # Policy keyword arguments
-        policy_kwargs = dict(
-            features_extractor_class=CustomLSTMExtractor,
-            features_extractor_kwargs=dict(features_dim=64)
-        )
-        self.model = A2C("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
+        self.model = A2C("MlpPolicy", self.w_env, verbose=0)
         self.reward_callback = RewardCallback("A2C")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,
@@ -134,8 +140,6 @@ class A2cMlp(Agent):
         self.model.learn(total_timesteps=episode_duration,
                          callback=[self.reward_callback, self.checkpoint_callback]
                          )
-        if plot_rewards:
-            self.reward_callback.plot_rewards()
 
     def predict(self, observation):
         """
@@ -155,7 +159,7 @@ class A2cMlp(Agent):
         assert self.model is not None
         self.model.save(path)
 
-    def load_model(self,  w_env: gym.Env, path: str = "models/a2c_mlp"):
+    def load_model(self, w_env: gym.Env, path: str = "models/a2c_mlp"):
         """
         Train the agent.
         :param w_env: gym Environment instance
@@ -168,5 +172,3 @@ class A2cMlp(Agent):
 
     def __repr__(self):
         return "A2C - MLP Policy"
-
-

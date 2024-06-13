@@ -15,43 +15,66 @@ class WarehouseEnv(gym.Env):
     ) -> None:
         super(WarehouseEnv, self).__init__()
         self.warehouse = warehouse
-        self.state = self.warehouse.state
-        self.action_space = spaces.MultiDiscrete([75*2, 76.125*2])
+        self.action_space = spaces.Discrete(301)
         self.step_duration = step_duration
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5 * len(self.warehouse.items),), dtype=np.float32)
         self.reward = 0
+        self.beginning = self.warehouse.env.now
         self.end = self.warehouse.env.now
 
     def _get_observation(self):
         obs = []
         for item in self.warehouse.items:
-            obs.extend([
-                self.warehouse.state[item.id].ip,
-                self.warehouse.state[item.id].qty_ordered_until_now,
-                self.warehouse.state[item.id].delta_time_last_order,
-                self.warehouse.state[item.id].orders_counter,
-                self.warehouse.state[item.id].order_rate
-            ])
+            item_id = item.id
+            obs.extend((
+                self.warehouse.inventory_levels[item_id],
+                self.warehouse.items_ordered_currently[item_id],
+                self.warehouse.delta_time_last_order[item_id],
+                self.warehouse.orders_counter_currently[item_id],
+                self.warehouse.order_rate(item)
+            ))
         return np.array(obs, dtype=np.float32)
 
     def reset(self, seed=42, **kwargs):
+        random.seed(seed)
         self.warehouse.env = simpy.Environment()
-        self.warehouse.env.seed(seed)
+        self.beginning = self.warehouse.env.now
         self.warehouse.reset_system_attributes()
         self.warehouse.run_processes()
         return self._get_observation(), {}
 
-    def step(self, actions):
+    def step(self, action: int, done_steps: int = 365*3, il_interval: [int] = [-5000, +5000]):
+        """
+        :param action: ty of item to order
+        :param done_steps: time to run before done for episode. Learn is mush bigger.
+        :param il_interval: interval level interval accepted before truncation
+        :return:
+        """
         info = {}
-        for idx, action in enumerate(actions):
-            item = self.warehouse.items[idx]
-            info[f'stock_before_action_item_{item}'.replace(" ","")] = self.state[item.id].ip
-            info[f'stock_after_action_item_{item}'.replace(" ","")] = self.state[item.id].ip + action
-            info[f'qty_2_order_item_{item}'.replace(" ","")] = action
-            self.warehouse.take_action(action, item)
+        idx = 1 if action >= 151 else 0
+        action = action % 151
+        item = self.warehouse.items[idx]
+        self.warehouse.take_action(action, item)
+        self.warehouse.env.run(until=self.warehouse.env.now+self.step_duration)
+        reward = -self.warehouse.total_cost
+        done = True if self.warehouse.env.now-self.beginning >= done_steps else False
+        truncated = not (il_interval[0] <= self.warehouse.inventory_levels[item.id] <= il_interval[1])
+        if truncated:
+            remaining_time_steps = self.warehouse.env.now-self.beginning
+            reward = self.truncated_cost(remaining_time_steps)
+        return self._get_observation(), reward, done, truncated, info
 
-        self.warehouse.env.run(until=self.end+self.step_duration)
-        self.end = self.warehouse.env.now
-        self.warehouse.update_costs()
-        self.reward = -1*self.warehouse.day_total_cost[-1]
-        return self._get_observation(), self.reward, False, False, info
+    def truncated_cost(self, remaining_time: int, weight: int = 10):
+        """
+
+        :param remaining_time: time step remaining after truncation
+        :param weight: weight to use to increment the cost of the truncation
+        :return: weighted shortage cost considering time and proportional cost
+        """
+        # avg_fixed_policy -> -21000
+        shortage_cost = sum(
+            -min(self.warehouse.inventory_levels[item.id], 0) * self.warehouse.shortage_cost
+            for item in self.warehouse.items
+        )
+        output = shortage_cost * remaining_time * weight
+        return output

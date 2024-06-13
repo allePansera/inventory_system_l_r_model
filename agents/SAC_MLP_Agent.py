@@ -119,12 +119,7 @@ class SacMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        # Policy keyword arguments
-        policy_kwargs = dict(
-            features_extractor_class=CustomLSTMExtractor,
-            features_extractor_kwargs=dict(features_dim=64)
-        )
-        self.model = SAC("MlpPolicy", self.w_env, verbose=1, policy_kwargs=policy_kwargs)
+        self.model = SAC("MlpPolicy", self.w_env, verbose=0)
         self.reward_callback = RewardCallback("SAC")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,
@@ -134,8 +129,6 @@ class SacMlp(Agent):
         self.model.learn(total_timesteps=episode_duration,
                          callback=[self.reward_callback, self.checkpoint_callback]
                          )
-        if plot_rewards:
-            self.reward_callback.plot_rewards()
 
     def predict(self, observation):
         """

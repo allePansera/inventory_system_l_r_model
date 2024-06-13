@@ -10,16 +10,16 @@ import matplotlib.pyplot as plt
 
 class Warehouse:
     def __init__(
-        self,
-        id: int,
-        env: simpy.Environment,
-        inventory_levels: List[Callable[[], float]],
-        items: List[Item] = [],
-        order_setup_cost: float = 10,
-        order_incremental_cost: float = 3,
-        holding_cost: float = 1,
-        shortage_cost: float = 7,
-        debug_mode: bool = False
+            self,
+            id: int,
+            env: simpy.Environment,
+            inventory_levels: List[Callable[[], float]],
+            items: List[Item] = (),
+            order_setup_cost: float = 10,
+            order_incremental_cost: float = 3,
+            holding_cost: float = 1,
+            shortage_cost: float = 7,
+            debug_mode: bool = False
     ) -> None:
 
         self.id = id
@@ -27,10 +27,10 @@ class Warehouse:
         self.items = items
         self.init_inventory_levels = inventory_levels
         self.inventory_levels = {
-                                item.id: int(init_level())
-                                for item, init_level
-                                in zip(self.items, self.init_inventory_levels)
-                            }
+            item.id: int(init_level())
+            for item, init_level
+            in zip(self.items, self.init_inventory_levels)
+        }
         self.order_setup_cost = order_setup_cost
         self.order_incremental_cost = order_incremental_cost
         self.holding_cost = holding_cost
@@ -38,7 +38,7 @@ class Warehouse:
         self.debug_mode = debug_mode
 
         # Attr. to handle inventory history
-        self.inventory_history = {item.id: {} for item in self.items}
+        self.inventory_history: {dict[float, int]} = {item.id: defaultdict(int) for item in self.items}
         self.it = {item.id: [(0, self.inventory_levels[item.id])] for item in self.items}
         self.last_inventory_levels = self.inventory_levels
         self.last_inventory_level_timestamps = {item.id: 0 for item in self.items}
@@ -70,6 +70,7 @@ class Warehouse:
         self.run_processes()
 
     def run_processes(self):
+        self.env.process(self.update_costs())
         for item in self.items:
             self.env.process(self.demand_generator(item))
             self.env.process(self.order_qty(item))
@@ -118,7 +119,7 @@ class Warehouse:
 
     def order_rate(self, item: Item):
         try:
-            order_rates = self.items_ordered_currently[item.id]/self.orders_counter_currently[item.id]
+            order_rates = self.items_ordered_currently[item.id] / self.orders_counter_currently[item.id]
             return order_rates
         except ZeroDivisionError:
             return 0
@@ -131,7 +132,7 @@ class Warehouse:
     def total_holding_cost(self) -> float:
         return sum(
             sum(max(level, 0) * duration * self.holding_cost
-            for level, duration in self.inventory_history[item.id].items())
+                for level, duration in self.inventory_history[item.id].items())
             for item in self.items
         )
 
@@ -139,7 +140,7 @@ class Warehouse:
     def total_shortage_cost(self) -> float:
         return sum(
             sum(max(-level, 0) * duration * self.shortage_cost
-            for level, duration in self.inventory_history[item.id].items())
+                for level, duration in self.inventory_history[item.id].items())
             for item in self.items
         )
 
@@ -160,11 +161,13 @@ class Warehouse:
         Called by Gym to update costs at each episode
         :return:
         """
-        if len(self.daily_total_cost) == 0:
-            self.daily_total_cost.append(round(self.total_cost, 2))
-        else:
-            previous_cost = sum(self.daily_total_cost)
-            self.daily_total_cost.append(round(self.total_cost-previous_cost, 2))
+        while True:
+            yield self.env.timeout(self.day_duration)
+            if len(self.daily_total_cost) == 0:
+                self.daily_total_cost.append(round(self.total_cost, 2))
+            else:
+                previous_cost = sum(self.daily_total_cost)
+                self.daily_total_cost.append(round(self.total_cost - previous_cost, 2))
 
     def order_qty(self, item: Item) -> None:
         """
@@ -173,8 +176,11 @@ class Warehouse:
         :return:
         """
         while True:
+            yield self.env.timeout(self.day_duration)
             if self.inventory_levels[item.id] < item.s_min:
                 qty_2_order = item.s_max - self.inventory_levels[item.id]
+                self._update_history(item)
+
                 if self.debug_mode: print(f"{item} is under s_min, make an order of {qty_2_order} units")
                 self.orders_counter_currently[item.id] += 1
                 self.items_ordered_currently[item.id] += qty_2_order
@@ -215,21 +221,22 @@ class Warehouse:
             demand_size = random.choices(pop, weights=weights, k=1)[0]
             if self.debug_mode: print(f"Customer arrived and requires {demand_size} items of type {item}")
             self.inventory_levels[item.id] -= demand_size
+            self._update_history(item)
 
     def system_description(self, output_path: str = "plot/"):
         fig, axs = plt.subplots(len(self.inventory_levels) + 1, 1, figsize=(12, 16))
 
-        for idx in range(len(self.inventory_levels)):
+        for idx, key in enumerate(self.inventory_levels):
             axs[idx].plot(
-                [it[0] for it in self.it[idx]],
-                [it[1] for it in self.it[idx]],
+                [it[0] for it in self.it[key]],
+                [it[1] for it in self.it[key]],
                 color='blue',
                 linewidth=2,
                 label=f'Inventory Position {idx}'
             )
             axs[idx].fill_between(
-                [it[0] for it in self.it[idx]],
-                [it[1] for it in self.it[idx]],
+                [it[0] for it in self.it[key]],
+                [it[1] for it in self.it[key]],
                 color='blue',
                 alpha=0.2,
                 label=f'Inventory Position {idx}'
@@ -278,3 +285,24 @@ class Warehouse:
             Order rate: {round(self.order_rate(item), 2)}
             """
         return outcome
+
+    def _update_history(self, item: Item):
+        """
+        Update inventory level history.
+        Each item History is a dictionary where keys are inventory levels and values are durations.
+
+        self.it is also updated with the current inventory level and the current time.
+
+        Parameters
+        ----------
+        item : Item
+            Item to update inventory level history
+        """
+        current_level = self.inventory_levels[item.id]
+
+        # Update last inventory level duration
+        self.inventory_history[item.id][current_level] += self.env.now - self.last_inventory_level_timestamps[item.id]
+        self.it[item.id].append((self.env.now, current_level))
+
+        # Update last inventory level
+        self.last_inventory_level_timestamps[item.id] = self.env.now

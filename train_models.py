@@ -46,7 +46,7 @@ item_2 = Item(
 items = [item_1, item_2]
 # Inventory initial position
 inventory_position_distribution_1 = lambda: random.uniform(-75, 75)
-inventory_position_distribution_2 = lambda: random.uniform(-76.125, 76.125)
+inventory_position_distribution_2 = lambda: random.uniform(-75, 75)
 # Define Simpy environment
 env = simpy.Environment()
 # Define Warehouse
@@ -68,8 +68,7 @@ w_gym_env = WarehouseEnv(
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
-    episode_duration=365*10, # 5 Year
-    plot_rewards=True
+    train_duration=365*1000, # 1000 Year
 )
 
 logger.info(f"All agents have been trained in {duration_sec} sec")
@@ -84,15 +83,15 @@ for agent in al.agents:
     "Inventory position Item 2", "Delta Quantity Ordered Item 2",
     "Delta Time Last Order Item 2", "Delta Orders Counter Item 2",
     "Order Rate Item 2",
-    "Action Item 1", "Action Item 2",
+    "Action Item",
     "Reward"]
 
     prediction = []
-    prediction.append([*obs, 0, 0, 0])
+    prediction.append([*obs, 0, 0])
     for _ in range(5):
-        actions, _states = agent.predict(obs)
-        obs, rewards, done, truncated, info = w_gym_env.step(actions)
-        prediction.append([*obs, *actions, rewards])
+        action, _state = agent.predict(obs)
+        obs, rewards, done, truncated, info = w_gym_env.step(action)
+        prediction.append([*obs, action, rewards])
 
     tab = tabulate(
         prediction,
