@@ -17,8 +17,8 @@ class AgentsLoader:
         self.__load_agents()
 
     def __load_agents(self):
-        self.agents.append(PpoMlp())
         self.agents.append(A2cMlp())
+        self.agents.append(PpoMlp())
         self.agents.append(DqnMlp())
         # self.agents.append(SacMlp())
 

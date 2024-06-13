@@ -180,7 +180,7 @@ class PpoMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = PPO('MlpPolicy', self.w_env, verbose=1)
+        self.model = PPO('MlpPolicy', self.w_env, verbose=0)
         self.model.load(path)
 
     def __repr__(self):

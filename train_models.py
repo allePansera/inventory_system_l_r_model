@@ -68,7 +68,7 @@ w_gym_env = WarehouseEnv(
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
-    train_duration=365*1000, # 1000 Year
+    train_duration=365*10_000, # 1000 Year
 )
 
 logger.info(f"All agents have been trained in {duration_sec} sec")

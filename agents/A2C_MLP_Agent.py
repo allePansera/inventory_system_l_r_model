@@ -167,7 +167,7 @@ class A2cMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = A2C('MlpPolicy', self.w_env, verbose=1)
+        self.model = A2C('MlpPolicy', self.w_env, verbose=0)
         self.model.load(path)
 
     def __repr__(self):
