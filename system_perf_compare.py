@@ -20,7 +20,6 @@ import logging
 import random
 import statistics
 import numpy as np
-
 from utils import clean_plot_directory, clean_log_file, generate_seeds
 
 warnings.filterwarnings("error", category=RuntimeWarning)
@@ -42,7 +41,7 @@ logging.basicConfig(
 # Logger creation
 logger = logging.getLogger(__name__)
 
-# Simulation time - 5 years
+# Simulation time - 100 years
 sim_time = 365 * 100
 
 # Define the items
