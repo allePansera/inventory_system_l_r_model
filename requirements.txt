@@ -7,3 +7,4 @@ stable-baselines3[extra]
 gymnasium
 tabulate
 stable-baselines
+tqdm
