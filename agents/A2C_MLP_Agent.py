@@ -1,9 +1,9 @@
 from stable_baselines3 import A2C
 from agents.AgentAbs import Agent
-from agents.Policy import CustomLSTMExtractor
 from agents.Callback import RewardCallback
 from stable_baselines3.common.callbacks import CheckpointCallback
 import gymnasium as gym
+import tensorflow as tf
 
 
 class A2cMlp(Agent):
@@ -130,7 +130,7 @@ class A2cMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = A2C("MlpPolicy", self.w_env, verbose=0)
+        self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard")
         self.reward_callback = RewardCallback("A2C")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

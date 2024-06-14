@@ -1,9 +1,9 @@
 from stable_baselines3 import PPO
 from agents.AgentAbs import Agent
-from agents.Policy import CustomLSTMExtractor
 from agents.Callback import RewardCallback
 from stable_baselines3.common.callbacks import CheckpointCallback
 import gymnasium as gym
+import tensorflow as tf
 
 
 class PpoMlp(Agent):
@@ -142,7 +142,7 @@ class PpoMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = PPO("MlpPolicy", self.w_env, verbose=0)
+        self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard")
         self.reward_callback = RewardCallback("PPO")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

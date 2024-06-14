@@ -1,9 +1,9 @@
 from stable_baselines3 import DQN
 from agents.AgentAbs import Agent
-from agents.Policy import CustomLSTMExtractor
 from agents.Callback import RewardCallback
 from stable_baselines3.common.callbacks import CheckpointCallback
 import gymnasium as gym
+import tensorflow as tf
 
 
 class DqnMlp(Agent):
@@ -134,7 +134,7 @@ class DqnMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = DQN("MlpPolicy", self.w_env, verbose=0)
+        self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard")
         self.reward_callback = RewardCallback("DQN")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

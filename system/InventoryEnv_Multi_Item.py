@@ -1,5 +1,6 @@
 import random
-
+from gymnasium.wrappers import NormalizeObservation
+from agents.Wrapper import NormalizeRewardWrapper
 from system.Inventory_Multi_Item import Warehouse
 from gymnasium import spaces
 import simpy
@@ -21,6 +22,13 @@ class WarehouseEnv(gym.Env):
         self.reward = 0
         self.beginning = self.warehouse.env.now
         self.end = self.warehouse.env.now
+
+    @classmethod
+    def with_normalize_wrapper(cls, *args, **kwargs):
+        env = cls(*args, **kwargs)
+        env = NormalizeObservation(env)
+        env = NormalizeRewardWrapper(env)
+        return env
 
     def _get_observation(self):
         obs = []

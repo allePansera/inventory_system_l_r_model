@@ -21,6 +21,8 @@ The following models have been trained:
 Also a Policy Fixed model has been implemented considering S_Min and S_Max retrivied at 2^K factorial design.
 
 100 Seeds are employed to get the total cost within each model. Average and variance are plotted at the end of all simulations.
+<br>
+Monitor training executing this bash script:  tensorboard --logdir ./log/a2c_mlp_tensorboard;./log/dqn_mlp_tensorboard;./log/ppo_mlp_tensorboard
 
 ### Output
 Check for the most recent picture inside [this directory](/docs/system_perf_compare)

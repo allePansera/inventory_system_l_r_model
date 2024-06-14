@@ -61,14 +61,14 @@ w_simpy_env = Warehouse(
     shortage_cost=7
 )
 # Define Warehouse Gym Env
-w_gym_env = WarehouseEnv(
+w_gym_env = WarehouseEnv.with_normalize_wrapper(
     warehouse=w_simpy_env,
     step_duration=1, # 1 Day, add delay to process last cost
 )
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
-    train_duration=365*10_000, # 1000 Year
+    train_duration=365*10_000, # 10000 Year
 )
 
 logger.info(f"All agents have been trained in {duration_sec} sec")
