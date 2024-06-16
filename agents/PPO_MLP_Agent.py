@@ -85,6 +85,9 @@ class PpoMlp(Agent):
         Description: The target value for the KL divergence between the old and new policies. If the KL divergence exceeds this value, training is stopped early.
         Default: None
     """
+
+
+
     def __init__(self):
         self.model = None
         self.w_env = None
@@ -100,8 +103,28 @@ class PpoMlp(Agent):
         :param plot_rewards: choose whether plot or not reward progression during training
         :return:
         """
+        params = {
+            "learning_rate": 3e-4,  # Learning rate for the optimizer
+            "n_steps": 2048,  # Number of steps to run for each environment per update
+            "batch_size": 128,  # Minibatch size for each update
+            "gamma": 0.995,  # Discount factor for future rewards
+            "gae_lambda": 0.98,  # Factor for trade-off of bias vs variance for Generalized Advantage Estimator
+            "clip_range": 0.2,  # Clipping parameter for PPO
+            "ent_coef": 0.01,  # Entropy coefficient for the loss calculation
+            "vf_coef": 0.5,  # Value function coefficient for the loss calculation
+            "max_grad_norm": 0.5,  # Maximum value for the gradient clipping
+            "n_epochs": 10,  # Number of epochs when optimizing the surrogate loss
+            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
+                "net_arch": [  # Custom network architecture
+                    dict(pi=[128, 128], vf=[128, 128])
+                ]
+            },
+            "verbose": 1,  # Verbosity level
+            "seed": 42,  # Seed for the pseudo-random generators
+            "device": "auto"  # Device on which the code should be run ('cpu', 'cuda', 'auto')
+        }
         self.w_env = w_env
-        self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard")
+        self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard", **params)
         self.reward_callback = RewardCallback("PPO")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

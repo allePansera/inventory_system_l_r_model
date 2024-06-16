@@ -56,16 +56,7 @@ class A2cMlp(Agent):
         'auto': Automatically uses a GPU if available.
 
     """
-    params = {
-        'learning_rate': 0.05,  # α
-        'n_steps': 16,  # number of steps to unroll the network for
-        'gamma': 0.99,  # discount factor
-        'gae_lambda': 0.95,  # λ
-        'ent_coef': 0.0,  # entropy coefficient
-        'vf_coef': 1.0,  # value function coefficient
-        'max_grad_norm': 2.0,  # max gradient norm
-        'normalize_advantage': False,  # normalize advantage
-    }
+
 
     def __init__(self):
         self.model = None
@@ -83,7 +74,17 @@ class A2cMlp(Agent):
         :return:
         """
         self.w_env = w_env
-        self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard")
+        params = {
+            'learning_rate': 0.05,  # α
+            'n_steps': 16,  # number of steps to unroll the network for
+            'gamma': 0.99,  # discount factor
+            'gae_lambda': 0.95,  # λ
+            'ent_coef': 0.0,  # entropy coefficient
+            'vf_coef': 1.0,  # value function coefficient
+            'max_grad_norm': 2.0,  # max gradient norm
+            'normalize_advantage': False,  # normalize advantage
+        }
+        self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard", **params)
         self.reward_callback = RewardCallback("A2C")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

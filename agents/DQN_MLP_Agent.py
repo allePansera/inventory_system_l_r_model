@@ -105,8 +105,21 @@ class DqnMlp(Agent):
         :param plot_rewards: choose whether plot or not reward progression during training
         :return:
         """
+        params = {
+            'batch_size': 256,  # size of a batch
+            'buffer_size': 512,  # replay buffer size (memory)
+            'learning_starts': 256,  # how many steps of the model to collect transitions for before learning starts
+            'exploration_initial_eps': 1,  # ε - initial
+            'exploration_final_eps': 0.15,  # ε - final
+            'gradient_steps': 1,  # how many gradient steps to do after each rollout
+            'target_update_interval': 32,  # update the target network every `x` steps
+            'train_freq': 4  # how often the training step is done
+            # 'tau': [1.0],  # target network update rate
+            # 'gamma': [0.90, 0.95, 0.99],  # discount factor
+            # 'exploration_fraction': [0.1, 0.2, 0.3, 0.5, 0.6],  # fraction of entire training period over which the ε is reduced
+        }
         self.w_env = w_env
-        self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard")
+        self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard", **params)
         self.reward_callback = RewardCallback("DQN")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,
