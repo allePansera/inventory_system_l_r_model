@@ -84,6 +84,10 @@ class PpoMlp(Agent):
 
         Description: The target value for the KL divergence between the old and new policies. If the KL divergence exceeds this value, training is stopped early.
         Default: None
+
+    policy_kwargs = dict(
+        net_arch=[dict(pi=[64, 64], vf=[64, 64])]  # Two hidden layers with 64 units each for both policy and value function
+    )
     """
 
 

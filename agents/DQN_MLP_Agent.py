@@ -74,6 +74,10 @@ class DqnMlp(Agent):
 
         Description: The exponent determining the degree of prioritization. A value of 0 means no prioritization, and a value closer to 1 means higher prioritization of important experiences.
         Default: 0.6
+
+    policy_kwargs = dict(
+        net_arch=[64, 64]  # Two hidden layers with 64 units each
+    )
     """
 
     params = {

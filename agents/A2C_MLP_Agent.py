@@ -55,6 +55,10 @@ class A2cMlp(Agent):
     device:
         'auto': Automatically uses a GPU if available.
 
+    policy_kwargs = dict(
+        net_arch=[dict(pi=[64, 64], vf=[64, 64])]  # Two hidden layers with 64 units each for both policy and value function
+    )
+
     """
 
 
