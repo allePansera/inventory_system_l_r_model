@@ -8,34 +8,6 @@ import tensorflow as tf
 
 class DqnMlp(Agent):
     """
-    Pseudo Code:
-
-    initialize replay buffer D to capacity N (memory of previous experience)
-    initialize action-value function Q with random weights
-    initialize target action-value function Q' with weights = Q
-
-    for episode = 1, M do
-        initialize state s1
-        for t = 1, T do
-            with probability epsilon select a random action a_t
-            otherwise select a_t = argmax_a Q(s_t, a; θ)
-
-            execute action a_t in environment and observe reward r_t and next state s_{t+1}
-
-            store transition (s_t, a_t, r_t, s_{t+1}, done) in D
-
-            sample random minibatch of transitions (s_j, a_j, r_j, s_{j+1}, done) from D
-
-            for each transition in minibatch do
-                if done
-                    y_j = r_j
-                else
-                    y_j = r_j + γ * max_a' Q'(s_{j+1}, a'; θ-)
-
-            perform a gradient descent step on (y_j - Q(s_j, a_j; θ))^2 with respect to the network parameters θ
-
-            if t mod C == 0:
-                update target network: Q' = Q
     Param:
 
     policy:

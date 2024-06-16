@@ -8,100 +8,53 @@ import tensorflow as tf
 
 class A2cMlp(Agent):
     """
-    Pseudo Code:
-
-    initialize replay buffer D to capacity N (memory of previous experience)
-    initialize action-value function Q with random weights
-    initialize target action-value function Q' with weights = Q
-
-    for episode = 1, M do
-        initialize state s1
-        for t = 1, T do
-            with probability epsilon select a random action a_t
-            otherwise select a_t = argmax_a Q(s_t, a; θ)
-
-            execute action a_t in environment and observe reward r_t and next state s_{t+1}
-
-            store transition (s_t, a_t, r_t, s_{t+1}, done) in D
-
-            sample random minibatch of transitions (s_j, a_j, r_j, s_{j+1}, done) from D
-
-            for each transition in minibatch do
-                if done
-                    y_j = r_j
-                else
-                    y_j = r_j + γ * max_a' Q'(s_{j+1}, a'; θ-)
-
-            perform a gradient descent step on (y_j - Q(s_j, a_j; θ))^2 with respect to the network parameters θ
-
-            if t mod C == 0:
-                update target network: Q' = Q
     Param:
 
     policy:
-
-        Description: This defines the policy model used by the agent. It can be a feed-forward neural network (MLP), a convolutional neural network (CNN), or a recurrent neural network (LSTM), depending on the environment and the type of observations.
-        Default: 'MlpPolicy' (for environments with low-dimensional observations)
+        'MlpPolicy': Uses a multi-layer perceptron (MLP) for the policy network.
 
     learning_rate:
+        0.0007: A default learning rate which balances the speed and stability of training.
 
-        Description: The learning rate controls how much the model's weights are adjusted with respect to the loss gradient. A higher learning rate means faster learning, but it might overshoot the optimal values. Conversely, a lower learning rate means slower but potentially more precise updates.
-        Default: 0.0005
-
-    buffer_size:
-
-        Description: The size of the replay buffer, which stores the agent's experiences (state, action, reward, next state, done). A larger buffer size allows the agent to learn from a more diverse set of experiences.
-        Default: 50000
-
-    exploration_fraction:
-
-        Description: The fraction of the total training steps during which the exploration rate (epsilon in the epsilon-greedy policy) is linearly decreased from its initial value to its final value. It determines how long the agent will explore before focusing on exploitation.
-        Default: 0.1
-
-    exploration_final_eps:
-
-        Description: The final value of epsilon after the exploration phase. It defines the probability of taking a random action instead of the best-known action.
-        Default: 0.02
-
-    train_freq:
-
-        Description: The frequency (in terms of steps) with which the model is updated. For example, if train_freq=1, the model is updated at every step. If train_freq=4, the model is updated every four steps.
-        Default: 1
-
-    batch_size:
-
-        Description: The number of experiences sampled from the replay buffer for each update of the model. A larger batch size can lead to more stable updates but requires more memory.
-        Default: 32
-
-    target_network_update_freq:
-
-        Description: The frequency (in terms of steps) with which the target network is updated to match the weights of the main network. This helps stabilize training by keeping the target values more consistent.
-        Default: 500
+    n_steps:
+        5: The agent collects data for 5 steps before performing an update.
 
     gamma:
+        0.99: The discount factor, which prioritizes future rewards slightly less than immediate rewards.
 
-        Description: The discount factor for future rewards. It determines the importance of future rewards compared to immediate rewards. A gamma close to 1 makes the agent focus on long-term rewards, while a gamma close to 0 makes it focus on short-term rewards.
-        Default: 0.99
+    gae_lambda:
+        1.0: Uses the Generalized Advantage Estimation with full weight on the advantage function.
 
-    learning_starts:
+    ent_coef:
+        0.0: No extra exploration encouragement by default.
 
-        Description: The number of steps before the agent starts learning. This allows the replay buffer to collect a sufficient amount of experiences before updates begin.
-        Default: 1000
+    vf_coef:
+        0.25: A balanced weight for the value function loss in the total loss calculation.
 
-    target_network_update_interval:
+    max_grad_norm:
+        0.5: Clips the gradients to prevent excessive updates.
 
-        Description: Similar to target_network_update_freq, it specifies the interval at which the target network's weights are updated.
-        Default: None (not used if target_network_update_freq is specified)
+    rms_prop_eps:
+        1e-5: A small value to ensure numerical stability in the RMSProp optimizer.
 
-    prioritized_replay:
+    use_rms_prop:
+        True: Uses the RMSProp optimizer, which can be beneficial for certain environments.
 
-        Description: A boolean parameter that indicates whether prioritized experience replay is used. When set to True, it allows the agent to prioritize important experiences over less important ones, improving learning efficiency.
-        Default: False
+    normalize_advantage:
+        False: No normalization of advantages by default.
 
-    prioritized_replay_alpha:
+    tensorboard_log:
+        None: No logging to TensorBoard by default.
 
-        Description: The exponent determining the degree of prioritization. A value of 0 means no prioritization, and a value closer to 1 means higher prioritization of important experiences.
-        Default: 0.6
+    create_eval_env:
+        False: No separate evaluation environment is created by default.
+
+    verbose:
+        0: No output unless there is an error or warning.
+
+    device:
+        'auto': Automatically uses a GPU if available.
+
     """
     params = {
         'learning_rate': 0.05,  # α

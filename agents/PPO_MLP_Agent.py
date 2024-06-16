@@ -8,47 +8,6 @@ import tensorflow as tf
 
 class PpoMlp(Agent):
     """
-    Pseudo Code:
-
-    Initialize policy network πθ with parameters θ
-    Initialize value function Vθv with parameters θv
-    Initialize replay buffer
-
-    for each iteration do:
-        for each environment step do:
-            Collect observation st
-            Sample action at from policy πθ(at | st)
-            Execute action at and observe reward rt and next state st+1
-            Store (st, at, rt, st+1) in replay buffer
-        end for
-
-        for each update step do:
-            Sample a random minibatch of transitions (st, at, rt, st+1) from the replay buffer
-
-            Compute advantages using Generalized Advantage Estimation (GAE)
-            δt = rt + γ * Vθv(st+1) - Vθv(st)
-            At = δt + γ * λ * δt+1 + (γ * λ)^2 * δt+2 + ...
-
-            Compute the ratio of new and old policy probabilities
-            rt(θ) = πθ(at | st) / πθ_old(at | st)
-
-            Compute the surrogate loss for the policy
-            L_clip(θ) = E[min(rt(θ) * At, clip(rt(θ), 1 - ε, 1 + ε) * At)]
-
-            Compute the value function loss
-            L_vf(θv) = (Vθv(st) - Rt)^2
-
-            Compute the entropy bonus to encourage exploration
-            S[πθ](st) = -Σ πθ(at | st) * log(πθ(at | st))
-
-            Compute the total loss
-            L(θ, θv) = L_clip(θ) - c1 * L_vf(θv) + c2 * S[πθ](st)
-
-            Perform gradient descent on L(θ, θv) to update θ and θv
-
-        end for
-    end for
-
     Param:
 
     policy:
