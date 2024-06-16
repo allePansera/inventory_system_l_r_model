@@ -123,7 +123,6 @@ class PpoMlp(Agent):
                     dict(pi=[128, 128], vf=[128, 128])
                 ]
             },
-            "verbose": 1,  # Verbosity level
             "seed": 42,  # Seed for the pseudo-random generators
             "device": "auto"  # Device on which the code should be run ('cpu', 'cuda', 'auto')
         }
