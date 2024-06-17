@@ -24,10 +24,11 @@ class WarehouseEnv(gym.Env):
         self.end = self.warehouse.env.now
 
     @classmethod
-    def with_normalize_wrapper(cls, *args, **kwargs):
+    def with_normalize_wrapper(cls, normalize=True, *args, **kwargs):
         env = cls(*args, **kwargs)
-        env = NormalizeObservation(env)
-        env = NormalizeRewardWrapper(env)
+        if normalize:
+            env = NormalizeObservation(env)
+            env = NormalizeRewardWrapper(env)
         return env
 
     def _get_observation(self):
