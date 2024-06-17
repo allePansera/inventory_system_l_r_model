@@ -66,6 +66,10 @@ class Warehouse:
         self.day_duration = 1
         self.month_duration = 30 * self.day_duration
 
+        # Costs History
+        self.cost_history = [round(self.total_cost, 2)]
+        self.yesterday_cost = round(self.total_cost, 2)
+
         # Handle all item processes
         self.run_processes()
 
@@ -163,11 +167,12 @@ class Warehouse:
         """
         while True:
             yield self.env.timeout(self.day_duration)
+            total_cost = self.total_cost
             if len(self.daily_total_cost) == 0:
-                self.daily_total_cost.append(round(self.total_cost, 2))
+                self.daily_total_cost.append(round(total_cost, 2))
             else:
-                previous_cost = sum(self.daily_total_cost)
-                self.daily_total_cost.append(round(self.total_cost - previous_cost, 2))
+                self.daily_total_cost.append(round(total_cost - self.yesterday_cost, 2))
+                self.yesterday_cost = total_cost
 
     def order_qty(self, item: Item) -> None:
         """

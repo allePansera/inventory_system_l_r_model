@@ -1,0 +1,4 @@
+Training agent: A2C - MLP Policy
+Loaded model from models/checkpoints/a2c_mlp_truncated.zip
+Training started...
+Training Progress:  22%|██▏       | 218446/1000000 [1:30:03<11:13:42, 19.33it/s]

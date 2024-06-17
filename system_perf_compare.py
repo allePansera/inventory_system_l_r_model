@@ -23,6 +23,7 @@ import numpy as np
 from utils import clean_plot_directory, clean_log_file, generate_seeds
 
 warnings.filterwarnings("error", category=RuntimeWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 logging_path = 'log/system_perf_compare.log'
 # Clean log
@@ -42,7 +43,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Simulation time - 100 years
-sim_time = 365 * 100
+sim_time = 365 * 10
 
 # Define the items
 item_1 = Item(
@@ -69,17 +70,35 @@ inventory_position_distribution_1 = lambda: random.uniform(-75, 75)
 inventory_position_distribution_2 = lambda: random.uniform(-75, 75)
 
 # Definizione dei seed
-seeds = generate_seeds(100)
+seeds = generate_seeds(500)
 policy_fixed_costs = []
+
+# Warm up periods taken from the welch_procedure notebook
+a2c_mlp_warmup = 150
+dqn_mlp_warmup = 220
+ppo_mlp_warmup = 150
+fixed___warmup = 100
+
 rl_agent_costs = {
-    'a2c_mlp': [],
-    'dqn_mlp': [],
-    'ppo_mlp': [],
+    'a2c_mlp': {
+        'cost': [],
+        'warm_up': a2c_mlp_warmup,
+    },
+    'dqn_mlp': {
+        'cost': [],
+        'warm_up': dqn_mlp_warmup,
+    },
+    'ppo_mlp': {
+        'cost': [],
+        'warm_up': ppo_mlp_warmup,
+    },
 }
+
 # RL agent list
 rl_agent_list = ['a2c_mlp', 'dqn_mlp', 'ppo_mlp']
 print("Running RL Agent...")
 for rl_agent in rl_agent_list:
+    warmp_up_agent = rl_agent_costs[rl_agent]['warm_up']
     for seed in tqdm(seeds):
         # Define Simpy environment
         env = simpy.Environment()
@@ -106,7 +125,7 @@ for rl_agent in rl_agent_list:
         for _ in range(sim_time):
             actions, _states = agent.predict(obs)
             obs, rewards, done, truncated, info = w_gym_env.step(actions)
-        rl_agent_costs[rl_agent].append(w_gym_env.warehouse.total_cost)
+        rl_agent_costs[rl_agent]['cost'].append(sum(w_gym_env.warehouse.daily_total_cost[warmp_up_agent:]))
         w_gym_env.warehouse.reset_system_attributes()
 
 # Policy fixed agent
@@ -128,15 +147,15 @@ for seed in tqdm(seeds):
     )
     # Run policy fixed system for given amount of time
     w_simpy_env_S.env.run(until=sim_time)
-    policy_fixed_costs.append(w_simpy_env_S.total_cost)
+    policy_fixed_costs.append(sum(w_simpy_env_S.daily_total_cost[fixed___warmup:]))
 
 avg_policy_fixed = statistics.mean(policy_fixed_costs)
 var_policy_fixed = np.var(policy_fixed_costs)
 avg_rl_agent = {}
 var_rl_agent = {}
 for agent in rl_agent_list:
-    avg_rl_agent[agent] = statistics.mean(rl_agent_costs[agent])
-    var_rl_agent[agent] = np.var(rl_agent_costs[agent])
+    avg_rl_agent[agent] = statistics.mean(rl_agent_costs[agent]['cost'])
+    var_rl_agent[agent] = np.var(rl_agent_costs[agent]['cost'])
 
 header = ["Avg. Costs s-S", "Avg. Costs A2C (mlp)", "Avg. Costs DQN (mlp)", "Avg. Costs PPO (mlp)", "Var. Costs s-S", "Var. Costs A2C (mlp)", "Var. Costs DQN (mlp)", "Var. Costs PPO (mlp)"]
 tab = tabulate(

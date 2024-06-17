@@ -7,16 +7,16 @@ import statistics
 
 class Warehouse:
     def __init__(
-        self,
-        id: int,
-        env: simpy.Environment,
-        inventory_levels: List[Callable[[], float]],
-        items: List[Item] = (),
-        order_setup_cost: float = 10,
-        order_incremental_cost: float = 3,
-        holding_cost: float = 1,
-        shortage_cost: float = 7,
-        debug_mode: bool = False
+            self,
+            id: int,
+            env: simpy.Environment,
+            inventory_levels: List[Callable[[], float]],
+            items: List[Item] = (),
+            order_setup_cost: float = 10,
+            order_incremental_cost: float = 3,
+            holding_cost: float = 1,
+            shortage_cost: float = 7,
+            debug_mode: bool = False
     ) -> None:
 
         self.id = id
@@ -24,10 +24,10 @@ class Warehouse:
         self.items = items
         self.init_inventory_levels = inventory_levels
         self.inventory_levels = {
-                                item.id: int(init_level())
-                                for item, init_level
-                                in zip(self.items, self.init_inventory_levels)
-                            }
+            item.id: int(init_level())
+            for item, init_level
+            in zip(self.items, self.init_inventory_levels)
+        }
         self.order_setup_cost = order_setup_cost
         self.order_incremental_cost = order_incremental_cost
         self.holding_cost = holding_cost
@@ -47,14 +47,19 @@ class Warehouse:
         self.day_duration = 1
         self.month_duration = 30 * self.day_duration
 
+        # Costs History
+        self.daily_total_cost = [self.total_cost]
+        self.yesterday_cost = self.total_cost
+
         # Handle all item processes
         self.run_processes()
-
 
     def run_processes(self):
         for item in self.items:
             pid = self.env.process(self.demand_generator(item))
             self.process_list.append(pid)
+        pid = self.env.process(self.update_cost_history())
+        self.process_list.append(pid)
 
     def reset_system_attributes(self):
         # Attr. to handle inventory levels
@@ -81,7 +86,7 @@ class Warehouse:
 
     def order_rate(self, item: Item):
         try:
-            order_rates = self.items_ordered_currently[item.id]/self.orders_counter_currently[item.id]
+            order_rates = self.items_ordered_currently[item.id] / self.orders_counter_currently[item.id]
             return order_rates
         except ZeroDivisionError:
             return 0
@@ -158,3 +163,13 @@ class Warehouse:
             demand_size = random.choices(pop, weights=weights, k=1)[0]
             if self.debug_mode: print(f"Customer arrived and requires {demand_size} items of type {item}")
             self.inventory_levels[item.id] -= demand_size
+
+    def update_cost_history(self):
+        """
+        Update cost history list with the total cost of the system.
+        """
+        while True:
+            yield self.env.timeout(self.day_duration)
+            total_cost = self.total_cost
+            self.daily_total_cost.append(round(total_cost - self.yesterday_cost, 2))
+            self.yesterday_cost = total_cost
