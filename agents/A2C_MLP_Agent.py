@@ -69,18 +69,18 @@ class A2cMlp(Agent):
         self.checkpoint_callback = None
         self.id = "a2c_mlp"
 
-    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True):
+    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True, use_params=True):
         """
         Train the agent.
         :param w_env: gym Environment instance
         :param episode_duration: how many episode run to find optimal policy and value function
         :param plot_rewards: choose whether plot or not reward progression during training
+        :param use_params: choose whether use or not params
         :return:
         """
         self.w_env = w_env
         params = {
             'learning_rate': 0.05,  # α
-            'n_steps': 16,  # number of steps to unroll the network for
             'gamma': 0.99,  # discount factor
             'gae_lambda': 0.95,  # λ
             'ent_coef': 0.0,  # entropy coefficient
@@ -88,7 +88,10 @@ class A2cMlp(Agent):
             'max_grad_norm': 2.0,  # max gradient norm
             'normalize_advantage': False,  # normalize advantage
         }
-        self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard", **params)
+        if use_params:
+            self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard", **params)
+        else:
+            self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard")
         self.reward_callback = RewardCallback("A2C")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

@@ -99,25 +99,23 @@ class PpoMlp(Agent):
         self.checkpoint_callback = None
         self.id = "ppo_mlp"
 
-    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True):
+    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True, use_params=True):
         """
         Train the agent.
         :param w_env: gym Environment instance
         :param episode_duration: how many episode run to find optimal policy and value function
         :param plot_rewards: choose whether plot or not reward progression during training
+        :param use_params: choose whether use or not the parameters of the model
         :return:
         """
         params = {
             "learning_rate": 3e-4,  # Learning rate for the optimizer
-            "n_steps": 2048,  # Number of steps to run for each environment per update
-            "batch_size": 128,  # Minibatch size for each update
             "gamma": 0.995,  # Discount factor for future rewards
             "gae_lambda": 0.98,  # Factor for trade-off of bias vs variance for Generalized Advantage Estimator
             "clip_range": 0.2,  # Clipping parameter for PPO
             "ent_coef": 0.01,  # Entropy coefficient for the loss calculation
             "vf_coef": 0.5,  # Value function coefficient for the loss calculation
             "max_grad_norm": 0.5,  # Maximum value for the gradient clipping
-            "n_epochs": 10,  # Number of epochs when optimizing the surrogate loss
             "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
                 "net_arch": [  # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])
@@ -127,7 +125,11 @@ class PpoMlp(Agent):
             "device": "auto"  # Device on which the code should be run ('cpu', 'cuda', 'auto')
         }
         self.w_env = w_env
-        self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard", **params)
+        if use_params:
+            self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard", **params)
+        else:
+            self.model = PPO("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/ppo_mlp_tensorboard")
+
         self.reward_callback = RewardCallback("PPO")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,

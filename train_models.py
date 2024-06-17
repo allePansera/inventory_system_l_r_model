@@ -69,6 +69,7 @@ w_gym_env = WarehouseEnv.with_normalize_wrapper(
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
     train_duration=365*10_000, # 10000 Year
+    use_params=True
 )
 
 logger.info(f"All agents have been trained in {duration_sec} sec")

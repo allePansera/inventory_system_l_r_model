@@ -26,10 +26,11 @@ class AgentsLoader:
         for agent in self.agents:
             agent.load_model(w_env=self.w_env)
 
-    def train(self, train_duration: int = 365 * 1000) -> float:
+    def train(self, train_duration: int = 365 * 1000, use_params=True) -> float:
         """
         Train the agents and store the respective models.
         :param train_duration: how many episode run to find optimal policy and value function
+        :param use_params: choose whether to use params or not
         :return: duration is seconds
         """
         start = datetime.datetime.now()
@@ -50,7 +51,7 @@ class AgentsLoader:
                     agent.load_model(w_env=self.w_env, path=latest_model_path)
                     print(f"Loaded model from {latest_model_path}")
                 # Train the agent
-                agent.train(self.w_env, train_duration)
+                agent.train(self.w_env, train_duration, use_params=use_params)
                 agent.save_model()
 
                 # Remove checkpoint if exists since i have full model saved

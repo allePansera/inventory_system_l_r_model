@@ -101,18 +101,16 @@ class DqnMlp(Agent):
         self.checkpoint_callback = None
         self.id = "dqn_mlp"
 
-    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True):
+    def train(self, w_env: gym.Env, episode_duration=1000, plot_rewards=True, use_params=True):
         """
         Train the agent.
         :param w_env: gym Environment instance
         :param episode_duration: how many episode run to find optimal policy and value function
         :param plot_rewards: choose whether plot or not reward progression during training
+        :param use_params: choose whether use or not default params
         :return:
         """
         params = {
-            'batch_size': 256,  # size of a batch
-            'buffer_size': 512,  # replay buffer size (memory)
-            'learning_starts': 256,  # how many steps of the model to collect transitions for before learning starts
             'exploration_initial_eps': 1,  # ε - initial
             'exploration_final_eps': 0.15,  # ε - final
             'gradient_steps': 1,  # how many gradient steps to do after each rollout
@@ -123,7 +121,10 @@ class DqnMlp(Agent):
             # 'exploration_fraction': [0.1, 0.2, 0.3, 0.5, 0.6],  # fraction of entire training period over which the ε is reduced
         }
         self.w_env = w_env
-        self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard", **params)
+        if use_params:
+            self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard", **params)
+        else:
+            self.model = DQN("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/dqn_mlp_tensorboard")
         self.reward_callback = RewardCallback("DQN")
         self.checkpoint_callback = CheckpointCallback(
             save_freq=1000,
