@@ -12,6 +12,15 @@ On average, obtained best results for the system are:
 - [Item 1: s=6, S=27 (d=21)](2k_factorial_design/item_0_analysis.png)
 
 ## Result
+
+After latest changes, systems take too long to be trained:
+```log
+Training agent: A2C - MLP Policy
+Loaded model from models/checkpoints/a2c_mlp_truncated.zip
+Training started...
+Training Progress:  22%|██▏       | 218446/1000000 [1:30:03<11:13:42, 19.33it/s]
+```
+
 ### Models
 The following models have been trained:
 - PPO
