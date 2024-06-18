@@ -70,14 +70,14 @@ inventory_position_distribution_1 = lambda: random.uniform(-75, 75)
 inventory_position_distribution_2 = lambda: random.uniform(-75, 75)
 
 # Definizione dei seed
-seeds = generate_seeds(500)
+seeds = generate_seeds(1000)
 policy_fixed_costs = []
 
 # Warm up periods taken from the welch_procedure notebook
-a2c_mlp_warmup = 150
-dqn_mlp_warmup = 220
-ppo_mlp_warmup = 150
-fixed___warmup = 100
+a2c_mlp_warmup = 200
+dqn_mlp_warmup = 250
+ppo_mlp_warmup = 200
+fixed___warmup = 150
 
 rl_agent_costs = {
     'a2c_mlp': {

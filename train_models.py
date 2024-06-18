@@ -9,6 +9,7 @@ import logging
 import simpy
 import random
 import warnings
+
 warnings.filterwarnings("error", category=RuntimeWarning)
 
 logging_path = 'log/output.log'
@@ -33,15 +34,15 @@ item_1 = Item(
     id="1",
     description="Iphone 15",
     lead_time=lambda: random.uniform(15, 30),
-    demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[1, 2, 3, 4], [1/3, 1/6, 1/6, 1/3]]
+    demand_inter_arrival_time=lambda: random.expovariate(lambd=1 / 3),
+    demand_distribution=[[1, 2, 3, 4], [1 / 3, 1 / 6, 1 / 6, 1 / 3]]
 )
 item_2 = Item(
     id="2",
     description="AirPods Pro",
     lead_time=lambda: random.uniform(6, 21),
-    demand_inter_arrival_time=lambda: random.expovariate(lambd=1/3),
-    demand_distribution=[[5, 4, 3, 2], [1/8, 1/2, 1/4, 1/8]]
+    demand_inter_arrival_time=lambda: random.expovariate(lambd=1 / 3),
+    demand_distribution=[[5, 4, 3, 2], [1 / 8, 1 / 2, 1 / 4, 1 / 8]]
 )
 items = [item_1, item_2]
 # Inventory initial position
@@ -64,12 +65,12 @@ w_simpy_env = Warehouse(
 w_gym_env = WarehouseEnv.with_normalize_wrapper(
     normalize=False,
     warehouse=w_simpy_env,
-    step_duration=1, # 1 Day, add delay to process last cost
+    step_duration=1,  # 1 Day, add delay to process last cost
 )
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
-    train_duration=365*10_000, # 10000 Year
+    train_duration=3_650_000,  # 10_000 Year
     use_params=True
 )
 
@@ -79,14 +80,14 @@ logger.info(f"All agents have been trained in {duration_sec} sec")
 for agent in al.agents:
     obs, _ = w_gym_env.reset()
     logger.info(agent)
-    headers = ["Inventory position Item 1","Delta Quantity Ordered Item 1",
-    "Delta Time Last Order Item 1", "Delta Orders Counter Item 1",
-    "Order Rate Item 1",
-    "Inventory position Item 2", "Delta Quantity Ordered Item 2",
-    "Delta Time Last Order Item 2", "Delta Orders Counter Item 2",
-    "Order Rate Item 2",
-    "Action Item",
-    "Reward"]
+    headers = ["Inventory position Item 1", "Delta Quantity Ordered Item 1",
+               "Delta Time Last Order Item 1", "Delta Orders Counter Item 1",
+               "Order Rate Item 1",
+               "Inventory position Item 2", "Delta Quantity Ordered Item 2",
+               "Delta Time Last Order Item 2", "Delta Orders Counter Item 2",
+               "Order Rate Item 2",
+               "Action Item",
+               "Reward"]
 
     prediction = []
     prediction.append([*obs, 0, 0])
@@ -101,4 +102,3 @@ for agent in al.agents:
         tablefmt="fancy_grid"
     )
     print(tab)
-

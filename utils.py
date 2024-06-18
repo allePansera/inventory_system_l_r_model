@@ -118,7 +118,10 @@ def generate_seeds(n=None) -> int | list[int]:
     seeds = []
     for i in range(n):
         s = random.randint(0, len(SEEDS) - 1)
-        if s not in seeds:
-            seeds.append(s)
+        trials = 0
+        while s in seeds and trials < 100:
+            s = random.randint(0, len(SEEDS) - 1)
+            trials += 1
+        seeds.append(s)
 
     return seeds
