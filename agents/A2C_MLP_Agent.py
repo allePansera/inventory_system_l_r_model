@@ -87,6 +87,11 @@ class A2cMlp(Agent):
             'vf_coef': 1.0,  # value function coefficient
             'max_grad_norm': 2.0,  # max gradient norm
             'normalize_advantage': False,  # normalize advantage
+            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
+                "net_arch": [  # Custom network architecture
+                    dict(pi=[128, 128], vf=[128, 128])
+                ]
+            }
         }
         if use_params:
             self.model = A2C("MlpPolicy", self.w_env, verbose=0, tensorboard_log="./log/a2c_mlp_tensorboard", **params)

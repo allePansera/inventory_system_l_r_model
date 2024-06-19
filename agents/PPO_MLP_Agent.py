@@ -120,9 +120,7 @@ class PpoMlp(Agent):
                 "net_arch": [  # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])
                 ]
-            },
-            "seed": 42,  # Seed for the pseudo-random generators
-            "device": "auto"  # Device on which the code should be run ('cpu', 'cuda', 'auto')
+            }
         }
         self.w_env = w_env
         if use_params:
