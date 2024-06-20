@@ -1,4 +1,4 @@
-2024-06-18 01:17:27 - __main__ - INFO - All agents have been trained in 25001.848144 sec
-2024-06-18 01:17:27 - __main__ - INFO - A2C - MLP Policy
-2024-06-18 01:17:27 - __main__ - INFO - PPO - MLP Policy
-2024-06-18 01:17:27 - __main__ - INFO - DQN - MLP Policy
+2024-06-20 14:34:14 - __main__ - INFO - All agents have been trained in 7733.130064 sec
+2024-06-20 14:34:14 - __main__ - INFO - A2C - MLP Policy
+2024-06-20 14:34:14 - __main__ - INFO - PPO - MLP Policy
+2024-06-20 14:34:14 - __main__ - INFO - DQN - MLP Policy
