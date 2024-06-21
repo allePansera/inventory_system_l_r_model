@@ -87,6 +87,7 @@ class A2cMlp(Agent):
             'vf_coef': 1.0,  # value function coefficient
             'max_grad_norm': 2.0,  # max gradient norm
             'normalize_advantage': False,  # normalize advantage
+            'n_steps': 10,  # number of steps
             "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
                 "net_arch": [  # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])

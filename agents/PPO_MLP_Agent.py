@@ -116,6 +116,7 @@ class PpoMlp(Agent):
             "ent_coef": 0.01,  # Entropy coefficient for the loss calculation
             "vf_coef": 0.5,  # Value function coefficient for the loss calculation
             "max_grad_norm": 0.5,  # Maximum value for the gradient clipping
+            "batch_size": 256,  # Number of experiences sampled from the replay buffer for each update
             "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
                 "net_arch": [  # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])

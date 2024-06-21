@@ -80,7 +80,6 @@ class DqnMlp(Agent):
     )
     """
 
-
     def __init__(self):
         self.model = None
         self.w_env = None
@@ -102,12 +101,13 @@ class DqnMlp(Agent):
             'exploration_final_eps': 0.15,  # ε - final
             'gradient_steps': 1,  # how many gradient steps to do after each rollout
             'target_update_interval': 32,  # update the target network every `x` steps
-            'train_freq': 4 , # how often the training step is done
+            'train_freq': 4,  # how often the training step is done
+            "batch_size": 256,  # Size of the batch
             "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
                 "net_arch": [  # Custom network architecture
                     128, 128
                 ]
-            }
+            },
         }
         self.w_env = w_env
         if use_params:

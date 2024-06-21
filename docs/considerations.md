@@ -63,7 +63,7 @@ Custom parameters have been used.
 }
 ```
 
-**Training** result can be found [here](/docs/training-tabulates/hyperp_noNormalization.log). sim_time: 3_650_000 timesteps for each model.
+**Training** result can be found [here](/docs/training-tabulates/hyperp_noNorm_1.log). sim_time: 3_650_000 timesteps for each model.
 
 After Welch Procedure, we have computed **output analysis** for all models (A2C, DQN, PPO and fxied cost). [Here the results](/docs/system_perf_compare/result_18062024_hyperp_noNormalization.log). sim_time = 365 * 10, seeds_number = 1000.
 
@@ -116,10 +116,62 @@ Custom parameters have been used.
         }
 }
 ```
+### 3. Using same hyperparameters, batch size increased
 
-**Training** result can be found [here](/docs/training-tabulates/hyperp_noNorm_2.log). sim_time: 3_650_000 timesteps for each model.
+Test without reward and observations normalizations.
+Custom parameters have been used.
 
-After Welch Procedure, we have computed **output analysis** for all models (A2C, DQN, PPO and fxied cost). [Here the results](/docs/system_perf_compare/result_20062024_hyperp_noNormalization_2.log). sim_time = 365 * 10, seeds_number = 1000.
+```json
+{
+  "a2c": {
+            'learning_rate': 0.05,  # α
+            'gamma': 0.99,  # discount factor
+            'gae_lambda': 0.95,  # λ
+            'ent_coef': 0.0,  # entropy coefficient
+            'vf_coef': 1.0,  # value function coefficient
+            'max_grad_norm': 2.0,  # max gradient norm
+            'normalize_advantage': False,  # normalize advantage,
+            'n_steps': 10,  # number of steps
+            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
+                "net_arch": [  # Custom network architecture
+                    dict(pi=[128, 128], vf=[128, 128])
+                ]
+            }
+  },
+  "dqn": {
+            'exploration_initial_eps': 1,  # ε - initial
+            'exploration_final_eps': 0.15,  # ε - final
+            'gradient_steps': 1,  # how many gradient steps to do after each rollout
+            'target_update_interval': 32,  # update the target network every `x` steps
+            'train_freq': 4 , # how often the training step is done
+            "batch_size": 256,  # Size of the batch
+            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
+                "net_arch": [  # Custom network architecture
+                    128, 128
+                ]
+            }
+  ,
+  "ppo": {
+            "learning_rate": 3e-4,  # Learning rate for the optimizer
+            "gamma": 0.995,  # Discount factor for future rewards
+            "gae_lambda": 0.98,  # Factor for trade-off of bias vs variance for Generalized Advantage Estimator
+            "clip_range": 0.2,  # Clipping parameter for PPO
+            "ent_coef": 0.01,  # Entropy coefficient for the loss calculation
+            "vf_coef": 0.5,  # Value function coefficient for the loss calculation
+            "max_grad_norm": 0.5,  # Maximum value for the gradient clipping
+            "batch_size": 256,  # Number of experiences sampled from the replay buffer for each update
+            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
+                "net_arch": [  # Custom network architecture
+                    dict(pi=[128, 128], vf=[128, 128])
+                ]
+            }
+        }
+}
+```
+
+**Training** result can be found [here](/docs/training-tabulates/hyperp_noNorm_3.log). sim_time: 3_650_000 timesteps for each model.
+
+After Welch Procedure, we have computed **output analysis** for all models (A2C, DQN, PPO and fxied cost). [Here the results](/docs/system_perf_compare/result_21062024_hyperp_noNormalization_3.log). sim_time = 365 * 10, seeds_number = 1000.
 
 ### Models
 The following models have been trained:

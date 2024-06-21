@@ -70,7 +70,7 @@ w_gym_env = WarehouseEnv.with_normalize_wrapper(
 # Train all agents' model
 al = AgentsLoader(w_gym_env)
 duration_sec = al.train(
-    train_duration=3_650_000,  # 10_000 Year
+    train_duration=5_000_000,  # 10_000 Year
     use_params=True
 )
 
