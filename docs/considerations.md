@@ -116,7 +116,7 @@ Custom parameters have been used.
         }
 }
 ```
-### 3. Using same hyperparameters, batch size increased
+### 4. Using same hyperparameters, batch size increased
 
 Test without reward and observations normalizations.
 Custom parameters have been used.
