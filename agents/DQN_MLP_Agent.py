@@ -97,14 +97,20 @@ class DqnMlp(Agent):
         :return:
         """
         params = {
-            'exploration_initial_eps': 1,  # ε - initial
-            'exploration_final_eps': 0.15,  # ε - final
-            'gradient_steps': 1,  # how many gradient steps to do after each rollout
-            'target_update_interval': 32,  # update the target network every `x` steps
-            'train_freq': 4,  # how often the training step is done
-            "batch_size": 256,  # Size of the batch
-            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
-                "net_arch": [  # Custom network architecture
+            'learning_rate': 0.0005,        # α — default: 0.0005
+            'buffer_size': 1000000,         # size of the replay buffer — default: 1000000
+            'learning_starts': 100,         # how many steps of the model to collect transitions for before learning starts — default: 100
+            "batch_size": 256,              # Size of the batch — default: 32
+            'tau': 1.0,                     # target network update frequency — default: 1.0
+            'gamma': 0.99,                  # discount factor — default: 0.99
+            'train_freq': 4,                # how often the training step is done — default: 4
+            'gradient_steps': 1,            # how many gradient steps to do after each rollout — default: 1
+            'target_update_interval': 32,   # update the target network every `x` steps — default: 10000
+            'exploration_fraction': 0.1,    # fraction of entire training period over which the exploration rate is reduced — default: 0.1
+            'exploration_initial_eps': 1,   # ε (initial) — default: 1.0
+            'exploration_final_eps': 0.15,  # ε (final) — default: 0.05
+            "policy_kwargs": {              # Additional arguments to be passed to the policy on creation
+                "net_arch": [               # Custom network architecture
                     128, 128
                 ]
             },

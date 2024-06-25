@@ -61,7 +61,6 @@ class A2cMlp(Agent):
 
     """
 
-
     def __init__(self):
         self.model = None
         self.w_env = None
@@ -80,16 +79,16 @@ class A2cMlp(Agent):
         """
         self.w_env = w_env
         params = {
-            'learning_rate': 0.05,  # α
-            'gamma': 0.99,  # discount factor
-            'gae_lambda': 0.95,  # λ
-            'ent_coef': 0.0,  # entropy coefficient
-            'vf_coef': 1.0,  # value function coefficient
-            'max_grad_norm': 2.0,  # max gradient norm
-            'normalize_advantage': False,  # normalize advantage
-            'n_steps': 10,  # number of steps
-            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
-                "net_arch": [  # Custom network architecture
+            'learning_rate': 0.05,         # α — default: 0.0007
+            'n_steps': 10,                 # number of steps to run for each environment per update — default: 5
+            'gamma': 0.99,                 # discount factor — default: 0.99
+            'gae_lambda': 0.95,            # λ - Generalized Advantage Estimator — default: 1.0
+            'ent_coef': 0.0,               # entropy coefficient — default: 0.0
+            'vf_coef': 1.0,                # value function coefficient — default: 0.5
+            'max_grad_norm': 2.0,          # max gradient norm — default: 0.5
+            'normalize_advantage': False,  # normalize advantage — default: False
+            "policy_kwargs": {             # Additional arguments to be passed to the policy on creation
+                "net_arch": [              # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])
                 ]
             }

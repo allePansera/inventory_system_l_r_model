@@ -109,16 +109,18 @@ class PpoMlp(Agent):
         :return:
         """
         params = {
-            "learning_rate": 3e-4,  # Learning rate for the optimizer
-            "gamma": 0.995,  # Discount factor for future rewards
-            "gae_lambda": 0.98,  # Factor for trade-off of bias vs variance for Generalized Advantage Estimator
-            "clip_range": 0.2,  # Clipping parameter for PPO
-            "ent_coef": 0.01,  # Entropy coefficient for the loss calculation
-            "vf_coef": 0.5,  # Value function coefficient for the loss calculation
-            "max_grad_norm": 0.5,  # Maximum value for the gradient clipping
-            "batch_size": 256,  # Number of experiences sampled from the replay buffer for each update
-            "policy_kwargs": {  # Additional arguments to be passed to the policy on creation
-                "net_arch": [  # Custom network architecture
+            "learning_rate": 3e-4,  # Learning rate for the optimizer — default: 0.0003
+            "n_steps": 2048,        # Number of steps to run for each environment per update — default: 2048
+            "batch_size": 256,      # Number of experiences sampled from the replay buffer for each update — default: 64
+            "n_epochs": 10,         # Number of epochs when optimizing the surrogate loss function — default: 10
+            "gamma": 0.995,         # Discount factor for future rewards — default: 0.99
+            "gae_lambda": 0.98,     # Factor for trade-off of bias vs variance for Generalized Advantage Estimator — default: 0.95
+            "clip_range": 0.2,      # Clipping parameter for PPO — default: 0.2
+            "ent_coef": 0.01,       # Entropy coefficient for the loss calculation — default: 0.0
+            "vf_coef": 0.5,         # Value function coefficient for the loss calculation — default: 0.5
+            "max_grad_norm": 0.5,   # Maximum value for the gradient clipping — default: 0.5
+            "policy_kwargs": {      # Additional arguments to be passed to the policy on creation
+                "net_arch": [       # Custom network architecture
                     dict(pi=[128, 128], vf=[128, 128])
                 ]
             }
