@@ -67,7 +67,7 @@ Custom parameters have been used.
 
 After Welch Procedure, we have computed **output analysis** for all models (A2C, DQN, PPO and fxied cost). [Here the results](/docs/system_perf_compare/result_18062024_hyperp_noNormalization.log). sim_time = 365 * 10, seeds_number = 1000.
 
-### 3. Using same hyperparameters
+### 3. Using same hyperparameters, policy_kwargs added
 
 Test without reward and observations normalizations.
 Custom parameters have been used.
