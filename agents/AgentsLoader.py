@@ -20,7 +20,6 @@ class AgentsLoader:
         self.agents.append(A2cMlp())
         self.agents.append(PpoMlp())
         self.agents.append(DqnMlp())
-        # self.agents.append(SacMlp())
 
     def load_weights(self):
         for agent in self.agents:
